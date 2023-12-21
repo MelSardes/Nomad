@@ -42,6 +42,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -106,6 +107,12 @@ fun BookingDetails(
         initialSelectedEndDateMillis = Instant.now().plus(Duration.ofDays(1)).toEpochMilli()
     )
 
+//    val daysDifference = remember {
+//        calculateDaysDifference(
+//            uiState.selectedBookingDates.first!!,
+//            uiState.selectedBookingDates.second!!
+//        )
+//    }
 
     var showDateRangePicker by remember { mutableStateOf(false) }
 
@@ -160,10 +167,10 @@ fun BookingDetails(
 
         Surface(
             modifier = modifier
+                .animateContentSize(animationSpec = spring(dampingRatio = 0.8f, stiffness = 500f))
                 .padding(horizontal = 24.dp)
                 .height(IntrinsicSize.Min)
-                .align(Alignment.Center)
-                .animateContentSize(animationSpec = spring(dampingRatio = 0.5f, stiffness = 50f)),
+                .align(Alignment.Center),
             shape = RoundedCornerShape(16.dp),
             shadowElevation = 4.dp
         ) {
@@ -171,13 +178,25 @@ fun BookingDetails(
                 ReservationState.RESERVATION_INFORMATION -> {
                     ReservationInformation(
                         viewModel = viewModel,
-                        uiState,
                         dateRangePickerState,
-                        Modifier,
+                        Modifier.animateContentSize(
+                            animationSpec = spring(
+                                dampingRatio = 0.8f,
+                                stiffness = 500f
+                            )
+                        ),
                         updateDemand,
                         onCheckInClick = { showDateRangePicker = !showDateRangePicker },
                         onCheckOutClick = { showDateRangePicker = !showDateRangePicker },
                     ) {
+                        if (uiState.selectedBookingDates == Pair(null, null)) {
+                            viewModel.updateBookingDates(
+                                Pair(
+                                    dateRangePickerState.selectedStartDateMillis,
+                                    dateRangePickerState.selectedEndDateMillis
+                                )
+                            )
+                        }
                         reservationState = ReservationState.PERSONAL_INFORMATION
                     }
                 }
@@ -185,7 +204,14 @@ fun BookingDetails(
                 ReservationState.PERSONAL_INFORMATION -> {
                     PersonalInformation(
                         uiState = uiState,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .animateContentSize(
+                                animationSpec = spring(
+                                    dampingRatio = 0.8f,
+                                    stiffness = 500f
+                                )
+                            ),
                         updateFirstName = updateFirstName,
                         updateLastName = updateLastName,
                         updateEmail = updateEmail,
@@ -199,7 +225,12 @@ fun BookingDetails(
                 else -> {
                     ReservationSummary(
                         uiState,
-                        modifier
+                        modifier.animateContentSize(
+                            animationSpec = spring(
+                                dampingRatio = 0.8f,
+                                stiffness = 500f
+                            )
+                        ),
                     ) {
                         reservationState = ReservationState.PERSONAL_INFORMATION
                     }
@@ -221,12 +252,11 @@ fun ReservationSummary(uiState: NomadUiState, modifier: Modifier, onBackPressed:
         LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE dd/MM/yyyy"))
     }
 
-    val daysDifference = remember {
-        calculateDaysDifference(
-            uiState.selectedBookingDates.first!!,
-            uiState.selectedBookingDates.second!!
-        )
-    }
+    val daysDifference = calculateDaysDifference(
+        uiState.selectedBookingDates.first!!,
+        uiState.selectedBookingDates.second!!
+    )
+
 
     BackHandler(true) {
         onBackPressed()
@@ -273,24 +303,20 @@ fun ReservationSummary(uiState: NomadUiState, modifier: Modifier, onBackPressed:
         }
 
         Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom
-        ) {
-            InfoSection(
-                "Prix total",
-                "$daysDifference nuit, 1 chambre",
-                modifier = Modifier.weight(1f)
-            )
 
-            Text(
-                text = "181.000 Fcfa",
-                color = MaterialTheme.colorScheme.secondary,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-        }
+        InfoSection(
+            "Prix total",
+            "$daysDifference nuit, 1 chambre",
+            modifier = Modifier.weight(1f)
+        )
+
+        Divider()
+        Text(
+            text = "181.000 Fcfa",
+            color = MaterialTheme.colorScheme.secondary,
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
         Spacer(modifier = Modifier.height(40.dp))
 
@@ -329,7 +355,6 @@ private fun InfoSection(title: String, data: String, modifier: Modifier = Modifi
 @Composable
 private fun ReservationInformation(
     viewModel: NomadViewModel,
-    uiState: NomadUiState,
     dateRangePickerState: DateRangePickerState,
     modifier: Modifier = Modifier,
     updateDemand: (String) -> Unit,
@@ -337,16 +362,29 @@ private fun ReservationInformation(
     onCheckOutClick: () -> Unit,
     onNextStep: () -> Unit,
 ) {
+
+    val uiState by viewModel.uiState.collectAsState()
     var selectedRadio by rememberSaveable {
         mutableIntStateOf(1)
     }
 
-    val cardColor = if (selectedRadio == 1) {
+    val card1Color = if (selectedRadio == 1) {
         MaterialTheme.colorScheme.primaryContainer
     } else {
         MaterialTheme.colorScheme.surface
     }
-    val cardContentColor = if (selectedRadio == 1) {
+    val card1ContentColor = if (selectedRadio == 1) {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
+
+    val card2Color = if (selectedRadio == 2) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
+    val card2ContentColor = if (selectedRadio == 2) {
         MaterialTheme.colorScheme.onPrimaryContainer
     } else {
         MaterialTheme.colorScheme.onSurface
@@ -378,8 +416,8 @@ private fun ReservationInformation(
                         shape = RoundedCornerShape(8.dp)
                     ),
                 colors = CardDefaults.cardColors(
-                    containerColor = cardColor,
-                    contentColor = cardContentColor
+                    containerColor = card1Color,
+                    contentColor = card1ContentColor
                 )
             ) {
                 Row(
@@ -406,8 +444,8 @@ private fun ReservationInformation(
                         shape = RoundedCornerShape(8.dp)
                     ),
                 colors = CardDefaults.cardColors(
-                    containerColor = cardColor,
-                    contentColor = cardContentColor
+                    containerColor = card2Color,
+                    contentColor = card2ContentColor
                 )
             ) {
                 Row(
@@ -425,11 +463,7 @@ private fun ReservationInformation(
         }
 
         Divider(thickness = 1.dp, modifier = Modifier.padding(vertical = 20.dp))
-        GuestsSection(
-            uiState,
-            increaseGuests = viewModel::increaseNumberOfGuests,
-            decreaseGuests = viewModel::decreaseNumberOfGuests,
-        )
+        GuestsSection(viewModel)
 
         Divider(thickness = 1.dp, modifier = Modifier.padding(vertical = 20.dp))
         OutlinedTextField(
@@ -552,6 +586,15 @@ fun DateSection(
     onCheckInClick: () -> Unit,
     onCheckOutClick: () -> Unit
 ) {
+
+    val numberOfDays = remember {
+        mutableIntStateOf(dateRangePickerState.selectedStartDateMillis?.let { startDate ->
+            dateRangePickerState.selectedEndDateMillis?.let { endDate ->
+                calculateDaysDifference(startDate, endDate)
+            }
+        }?.toInt() ?: -1)
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -586,14 +629,8 @@ fun DateSection(
             )
         }
 
-        val numberOfDays: Int = dateRangePickerState.selectedStartDateMillis?.let { startDate ->
-            dateRangePickerState.selectedEndDateMillis?.let { endDate ->
-                calculateDaysDifference(startDate, endDate)
-            }
-        }?.toInt() ?: -1
-
         Text(
-            text = numberOfDays.let {
+            text = numberOfDays.intValue.let {
                 if (it == 1) {
                     "1 nuit"
                 } else if (it > 1) {
@@ -644,13 +681,13 @@ fun DateSection(
 }
 
 @Composable
-private fun GuestsSection(
-    uiState: NomadUiState,
-    increaseGuests: () -> Unit,
-    decreaseGuests: () -> Unit
-) {
+private fun GuestsSection(viewModel: NomadViewModel) {
 
-//    var numberOfGuests by rememberSaveable { mutableStateOf(uiState.numberOfGuests) }
+    val uiState by viewModel.uiState.collectAsState()
+
+    val numberOfGuests by remember { derivedStateOf { uiState.numberOfGuests } }
+    val decreaseNumberOfGuests = remember(viewModel) { { viewModel.decreaseNumberOfGuests() } }
+    val increaseNumberOfGuests = remember(viewModel) { { viewModel.increaseNumberOfGuests() } }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -667,18 +704,18 @@ private fun GuestsSection(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(onClick = { decreaseGuests() }) {
+            TextButton(onClick = decreaseNumberOfGuests) {
                 Text(text = "-", fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
             }
 
             Text(
-                text = uiState.numberOfGuests.toString(),
+                text = numberOfGuests.toString(),
                 style = MaterialTheme.typography
                     .bodyLarge
                     .copy(color = MaterialTheme.colorScheme.inversePrimary)
             )
 
-            TextButton(onClick = { increaseGuests() }) {
+            TextButton(onClick = increaseNumberOfGuests) {
                 Text(text = "+", fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
             }
         }

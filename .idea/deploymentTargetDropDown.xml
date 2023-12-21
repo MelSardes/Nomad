@@ -16,6 +16,27 @@
             </Target>
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2023-12-20T10:17:20.358626100Z" />
+          <multipleDevicesSelectedInDropDown value="true" />
+          <runningDeviceTargetsSelectedWithDialog>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\SlymDev\.android\avd\Pixel_7_API_34.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="SERIAL_NUMBER" />
+                  <value value="adb-100383732H003442-La1htg._adb-tls-connect._tcp" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </runningDeviceTargetsSelectedWithDialog>
         </State>
       </entry>
     </value>

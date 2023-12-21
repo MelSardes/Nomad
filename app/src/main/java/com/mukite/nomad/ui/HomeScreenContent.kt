@@ -12,17 +12,30 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -97,14 +110,12 @@ fun MapSection(modifier: Modifier) {
 
         Spacer(modifier = Modifier.height(8.dp))
         Box(modifier = Modifier, contentAlignment = Alignment.Center) {
-/*
             Image(
                 painter = painterResource(id = R.drawable.nomad_main),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
-*/
         }
     }
 }
@@ -153,7 +164,8 @@ fun ServiceItem(modifier: Modifier = Modifier, service: Service) {
 }
 
 @Composable
-fun DescriptionSection(isContentHidden: Boolean = true, clickOnContent: () -> Unit) {
+fun DescriptionSection() {
+    var isContentHidden by rememberSaveable { mutableStateOf(true) }
 
     Column {
         HeaderSectionTitle(title = R.string.description)
@@ -163,7 +175,7 @@ fun DescriptionSection(isContentHidden: Boolean = true, clickOnContent: () -> Un
         Text(
             modifier = Modifier
                 .animateContentSize()
-                .clickable(onClick = { clickOnContent() }),
+                .clickable(onClick = { isContentHidden = !isContentHidden }),
 
             text = buildAnnotatedString {
                 append(stringResource(R.string.nomad_hotel_description))
@@ -192,7 +204,6 @@ fun GallerySection(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-/*
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.height(112.dp)
@@ -214,7 +225,6 @@ fun GallerySection(modifier: Modifier = Modifier) {
                 }
             }
         }
-*/
     }
 }
 
@@ -244,10 +254,8 @@ fun HeaderSectionTitle(@StringRes title: Int, @StringRes link: Int? = null) {
 }
 
 
-/*
-private val galleryImages = listOf<R.drawable>(
-*/
-/*    R.drawable.gallerie1,
+private val galleryImages = listOf(
+    R.drawable.gallerie1,
     R.drawable.gallerie2,
     R.drawable.gallerie3,
     R.drawable.gallerie4,
@@ -255,7 +263,5 @@ private val galleryImages = listOf<R.drawable>(
     R.drawable.gallerie6,
     R.drawable.gallerie7,
     R.drawable.gallerie8,
-    R.drawable.gallerie9,*//*
-
+    R.drawable.gallerie9,
 )
-*/

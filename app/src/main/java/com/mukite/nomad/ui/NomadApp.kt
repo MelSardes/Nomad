@@ -1,6 +1,11 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.mukite.nomad.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,12 +28,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -141,7 +148,6 @@ fun NomadAppBar(
 @Composable
 fun NomadApp(
 ) {
-    val viewModel = remember { NomadViewModel() }
     val navController: NavHostController = rememberNavController()
     val shouldShowBottomBar = remember { mutableStateOf(false) }
 
@@ -150,12 +156,6 @@ fun NomadApp(
         navBackStackEntry?.destination
     }
 
-    // Remember expensive calculations for efficiency
-    val currentDestinationHierarchy by remember(currentDestination) {
-        mutableStateOf(currentDestination?.hierarchy)
-    }
-
-    val verticalScrollState = rememberScrollState()
 
 
     Scaffold(
@@ -180,30 +180,30 @@ fun NomadApp(
 
             if (shouldShowBottomBar.value) {
 
-                LeNomadBottomNavigationBar(currentDestination = currentDestination, navigateToPage = {route ->
-                    navController.navigate(route) {
-                        // Pop up to the start destination of the graph to
-                        // avoid building up a large stack of destinations
-                        // on the back stack as users select items
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
+                LeNomadBottomNavigationBar(
+                    currentDestination = currentDestination,
+                    navigateToPage = { route ->
+                        navController.navigate(route) {
+                            // Pop up to the start destination of the graph to
+                            // avoid building up a large stack of destinations
+                            // on the back stack as users select items
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
 
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
-                        restoreState = true
-                }
-                })
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            launchSingleTop = true
+                            // Restore state when reselecting a previously selected item
+                            restoreState = true
+                        }
+                    })
             }
         }
 
     ) { innerPadding ->
 
-
-        NomadNavContent(navController, innerPadding, verticalScrollState, viewModel)
-
+        NomadNavContent(navController, innerPadding)
 
         LaunchedEffect(navController) {
             // Update shouldShowBottomBar based on navigation events
@@ -216,39 +216,38 @@ fun NomadApp(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NomadNavContent(
     navController: NavHostController,
     innerPadding: PaddingValues,
-    verticalScrollState: ScrollState,
-    viewModel: NomadViewModel
 ) {
+    val viewModel = remember { NomadViewModel() }
+    val appBarScrollState = rememberTopAppBarState()
+    val listScrollState = rememberScrollState()
+
     NavHost(
         navController = navController,
         startDestination = NomadScreen.Home.name,
-        modifier = Modifier.padding(innerPadding)
+        modifier = Modifier.padding(innerPadding),
+//        enterTransition = { fadeIn(animationSpec = tween(700)) },
+//        exitTransition = { fadeOut(animationSpec = tween(700)) },
+//        popEnterTransition = { fadeIn(animationSpec = tween(700)) },
+//        popExitTransition = { fadeOut(animationSpec = tween(700)) },
     ) {
         composable(route = BottomNavigationItem.Home.route) {
 //                Text(text = "Home")
-            HomeScreen(
-                verticalScrollState,
-                modifier = Modifier.fillMaxSize()
-            ) {
+            HomeScreen(modifier = Modifier.fillMaxSize()) {
                 navController.navigate(NomadScreen.BookingDetails.name)
             }
         }
 
-
         composable(route = BottomNavigationItem.UserProfile.route) {
-            Surface {
-                Text(text = "User Profile")
-            }
+            UserProfile(appBarScrollState, listScrollState, Modifier.fillMaxSize())
         }
 
         composable(route = BottomNavigationItem.Bookings.route) {
-            Surface {
-                Text(text = "Bookings")
-            }
+            Bookings(modifier = Modifier.fillMaxSize())
         }
 
         composable(route = NomadScreen.SelectDate.name) {
@@ -262,7 +261,6 @@ private fun NomadNavContent(
         }
 
         composable(route = NomadScreen.BookingDetails.name) {
-
             BookingDetails(viewModel = viewModel)
         }
     }

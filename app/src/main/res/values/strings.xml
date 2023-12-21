@@ -35,4 +35,7 @@
     <string name="phoneNumber">Numéro de téléphone</string>
     <string name="personalInformation">Informations personelles</string>
     <string name="cancel">Annuler</string>
+    <string name="user_profile_name">Morriss Morrisson</string>
+    <string name="user_profile_location">Libreville, Estuaire</string>
+    <string name="user_profile_email">morrissmorrisson01@gmail.com</string>
 </resources>

@@ -45,16 +45,15 @@ import com.mukite.nomad.R
 
 @Composable
 fun HomeScreen(
-    scrollState: ScrollState,
     modifier: Modifier = Modifier,
     navigateToDateSelection: () -> Unit,
 ) {
-    var isContentHidden by remember { mutableStateOf(true) }
+    val verticalScrollState = rememberScrollState()
 
     Column(
         modifier = modifier
             .padding(0.dp)
-            .verticalScroll(scrollState)
+            .verticalScroll(verticalScrollState)
             .fillMaxSize()
     ) {
         HeaderImage()
@@ -85,18 +84,16 @@ fun HomeScreen(
             Divider(color = Color.Black.copy(alpha = 0.2f))
 
             Spacer(modifier = Modifier.height(24.dp))
-            DescriptionSection(isContentHidden = isContentHidden) {
-                isContentHidden = !isContentHidden
-            }
+            DescriptionSection()
 
             Spacer(modifier = Modifier.height(24.dp))
-//            GallerySection(modifier = Modifier.fillMaxWidth())
+            GallerySection(modifier = Modifier.fillMaxWidth())
 
             Spacer(modifier = Modifier.height(24.dp))
             ServicesSection(modifier = Modifier.fillMaxWidth())
 
             Spacer(modifier = Modifier.height(24.dp))
-//            MapSection(modifier = Modifier.fillMaxWidth())
+            MapSection(modifier = Modifier.fillMaxWidth())
 
 
 
@@ -180,5 +177,5 @@ fun TabItem(icon: ImageVector, index: Int, selectedIndex: Int, modifier: Modifie
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(rememberScrollState()) {}
+    HomeScreen {}
 }
