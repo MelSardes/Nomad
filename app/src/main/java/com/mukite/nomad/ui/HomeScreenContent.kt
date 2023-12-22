@@ -48,6 +48,9 @@ import androidx.compose.ui.unit.sp
 import com.mukite.nomad.R
 import com.mukite.nomad.data.datasource.DataSource
 import com.mukite.nomad.data.model.Service
+import com.mukite.nomad.utils.HtmlText
+import com.mukite.nomad.utils.IFrameContent
+import com.mukite.nomad.utils.WebViewScreen
 
 
 @Composable
@@ -110,12 +113,8 @@ fun MapSection(modifier: Modifier) {
 
         Spacer(modifier = Modifier.height(8.dp))
         Box(modifier = Modifier, contentAlignment = Alignment.Center) {
-            Image(
-                painter = painterResource(id = R.drawable.nomad_main),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
+            //WebViewScreen(modifier = Modifier.fillMaxSize())
+            IFrameContent(modifier = Modifier.fillMaxSize())
         }
     }
 }

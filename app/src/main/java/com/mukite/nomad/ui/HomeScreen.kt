@@ -93,7 +93,7 @@ fun HomeScreen(
             ServicesSection(modifier = Modifier.fillMaxWidth())
 
             Spacer(modifier = Modifier.height(24.dp))
-            MapSection(modifier = Modifier.fillMaxWidth())
+            MapSection(modifier = Modifier.fillMaxWidth().height(200.dp))
 
 
 
