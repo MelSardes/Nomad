@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mukite.nomad.R
+import com.mukite.nomad.utils.MapView
 
 
 @Composable
@@ -56,7 +57,7 @@ fun HomeScreen(
             .verticalScroll(verticalScrollState)
             .fillMaxSize()
     ) {
-        HeaderImage()
+        HeaderImage(modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(14.dp))
 
         Column(modifier = Modifier
@@ -93,63 +94,8 @@ fun HomeScreen(
             ServicesSection(modifier = Modifier.fillMaxWidth())
 
             Spacer(modifier = Modifier.height(24.dp))
-            MapSection(modifier = Modifier.fillMaxWidth().height(200.dp))
-
-
-
+            MapSection(modifier = Modifier.height(200.dp).fillMaxWidth())
         }
-    }
-}
-
-@Composable
-fun SegmentedSwitch() {
-    var selectedTabIndex by remember { mutableStateOf(0) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
-                .padding(4.dp)
-                .selectableGroup()
-        ) {
-            TabItem(
-                icon = Icons.Default.Home,
-                index = 0,
-                selectedTabIndex,
-                modifier = Modifier.weight(1f),
-                onTabSelected = { selectedTabIndex = it }
-            )
-            TabItem(
-                icon = Icons.Default.Email,
-                index = 1,
-                selectedTabIndex,
-                modifier = Modifier.weight(1f),
-                onTabSelected = { selectedTabIndex = it }
-            )
-            TabItem(
-                icon = Icons.Default.Person,
-                index = 2,
-                selectedTabIndex,
-                modifier = Modifier.weight(1f),
-                onTabSelected = { selectedTabIndex = it }
-            )
-            TabItem(
-                icon = Icons.Default.Settings,
-                index = 3,
-                selectedTabIndex,
-                modifier = Modifier.weight(1f),
-                onTabSelected = { selectedTabIndex = it }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Selected Tab Index: $selectedTabIndex", style = MaterialTheme.typography.bodyLarge)
     }
 }
 

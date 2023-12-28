@@ -155,19 +155,19 @@ fun NomadApp(
     Scaffold(
 
 //                TODO : MAKE TOP BAR VISIBLE ONLY WHEN MAIN SCREEN
-        /*
 
-                        topBar = {
-        //                    if (currentDestination?.hierarchy?.any { bottomNavigationItems.contains(it.route) } == true)
-                            LeNomadAppBar(
-                                currentScreen = currentDestination,
-                                canNavigateBack = navController.previousBackStackEntry != null,
-                                navigateUp = { navController.navigateUp() }
-                            )
 
-        //                    else null
-                        },
-        */
+/*
+        topBar = {
+                NomadAppBar(
+                    currentScreen = currentDestination,
+                    canNavigateBack = navController.previousBackStackEntry != null,
+                    navigateUp = { navController.navigateUp() }
+                )
+
+            //                    else null
+        },
+*/
 
 
         bottomBar = {
@@ -202,13 +202,44 @@ fun NomadApp(
         LaunchedEffect(navController) {
             // Update shouldShowBottomBar based on navigation events
             navController.addOnDestinationChangedListener { _, destination, _ ->
-                shouldShowBottomBar.value = destination?.hierarchy?.any {
+                shouldShowBottomBar.value = destination.hierarchy.any {
                     it.route in bottomNavigationItems.map { item -> item.route }
                 } == true
             }
         }
     }
 }
+
+/*@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LeNomadAppBar(
+    currentScreen: NavDestination?,
+    canNavigateBack: Boolean,
+    navigateUp: () -> Boolean
+) {
+    TopAppBar(
+        title = { Text(
+            currentScreen?.route.orEmpty()
+        ) },
+        navigationIcon = {
+            if (canNavigateBack) {
+                IconButton(onClick = { navigateUp() }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = null
+                    )
+                }
+            }
+        },
+        colors = TopAppBarDefaults.mediumTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.primary,
+            actionIconContentColor = MaterialTheme.colorScheme.primary,
+            scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+        )
+    )
+}*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -257,7 +288,9 @@ private fun NomadNavContent(
         }
 
         composable(route = NomadScreen.BookingDetails.name) {
-            BookingDetails(viewModel = viewModel)
+            BookingDetails(viewModel = viewModel, modifier = Modifier.fillMaxSize()) {
+                navController.navigateUp()
+            }
         }
     }
 }

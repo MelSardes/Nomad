@@ -13,36 +13,42 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DateRangePickerState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -59,53 +65,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mukite.nomad.R
-import com.mukite.nomad.data.model.NomadUiState
-import com.mukite.nomad.ui.HeaderImage
-import com.mukite.nomad.ui.HeaderSectionTitle
+import com.mukite.nomad.data.NomadUiState
 import com.mukite.nomad.ui.NomadViewModel
+import com.mukite.nomad.ui.RoomType
 import com.mukite.nomad.utils.calculateDaysDifference
 import com.mukite.nomad.utils.formatLongToDate
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 
 enum class ReservationState {
     RESERVATION_INFORMATION, PERSONAL_INFORMATION, SUMMARY
 }
 
-enum class DatePickerStateValue {
-    START, END, NULL
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookingDetails(
     viewModel: NomadViewModel,
     modifier: Modifier = Modifier,
+    onBack: () -> Unit
 ) {
-    val updateDemand: (demand: String) -> Unit =
-        remember(viewModel) { { demand -> viewModel.updateParticularDemand(demand) } }
 
-    val updateFirstName: (firstName: String) -> Unit =
-        remember(viewModel) { { firstName -> viewModel.updateFirstName(firstName) } }
-
-    val updateLastName: (lastName: String) -> Unit =
-        remember(viewModel) { { lastName -> viewModel.updateLastName(lastName) } }
-
-    val updateEmail: (email: String) -> Unit =
-        remember(viewModel) { { email -> viewModel.updateEmail(email) } }
-
-    val updatePhoneNumber: (phoneNumber: String) -> Unit =
-        remember(viewModel) { { phoneNumber -> viewModel.updatePhoneNumber(phoneNumber) } }
 
     val uiState by viewModel.uiState.collectAsState()
 
-    val dateRangePickerState = rememberDateRangePickerState(
-        initialSelectedStartDateMillis = Instant.now().toEpochMilli(),
-        initialSelectedEndDateMillis = Instant.now().plus(Duration.ofDays(1)).toEpochMilli()
-    )
 
 //    val daysDifference = remember {
 //        calculateDaysDifference(
@@ -114,133 +99,117 @@ fun BookingDetails(
 //        )
 //    }
 
-    var showDateRangePicker by remember { mutableStateOf(false) }
 
     var reservationState by rememberSaveable {
         mutableStateOf(ReservationState.RESERVATION_INFORMATION)
     }
 
 
-    if (showDateRangePicker) {
-        DatePickerDialog(
-            onDismissRequest = {
-                showDateRangePicker = false
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDateRangePicker = !showDateRangePicker
-                    viewModel.updateBookingDates(
-                        Pair(
-                            dateRangePickerState.selectedStartDateMillis,
-                            dateRangePickerState.selectedEndDateMillis
-                        )
-                    )
-                }) {
-                    Text(text = stringResource(id = R.string.confirm))
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
+        Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            TopBar() {
+                if (reservationState != ReservationState.RESERVATION_INFORMATION) {
+                    reservationState = ReservationState.RESERVATION_INFORMATION
+                } else {
+                    onBack()
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showDateRangePicker = false
-                }) {
-                    Text(text = stringResource(id = R.string.cancel))
-                }
-            },
-        ) {
-            DateRangePicker(
-                state = dateRangePickerState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .height(500.dp)
-            )
-        }
-    }
+            }
 
-
-    Box(Modifier.fillMaxSize()) {
-        HeaderImage(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter)
-        )
-
-        Surface(
-            modifier = modifier
-                .animateContentSize(animationSpec = spring(dampingRatio = 0.8f, stiffness = 500f))
-                .padding(horizontal = 24.dp)
-                .height(IntrinsicSize.Min)
-                .align(Alignment.Center),
-            shape = RoundedCornerShape(16.dp),
-            shadowElevation = 4.dp
-        ) {
             when (reservationState) {
                 ReservationState.RESERVATION_INFORMATION -> {
                     ReservationInformation(
-                        viewModel = viewModel,
-                        dateRangePickerState,
-                        Modifier.animateContentSize(
-                            animationSpec = spring(
-                                dampingRatio = 0.8f,
-                                stiffness = 500f
-                            )
-                        ),
-                        updateDemand,
-                        onCheckInClick = { showDateRangePicker = !showDateRangePicker },
-                        onCheckOutClick = { showDateRangePicker = !showDateRangePicker },
-                    ) {
-                        if (uiState.selectedBookingDates == Pair(null, null)) {
-                            viewModel.updateBookingDates(
-                                Pair(
-                                    dateRangePickerState.selectedStartDateMillis,
-                                    dateRangePickerState.selectedEndDateMillis
-                                )
-                            )
-                        }
-                        reservationState = ReservationState.PERSONAL_INFORMATION
-                    }
-                }
-
-                ReservationState.PERSONAL_INFORMATION -> {
-                    PersonalInformation(
                         uiState = uiState,
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        viewModel = viewModel,
+                        Modifier
                             .animateContentSize(
                                 animationSpec = spring(
                                     dampingRatio = 0.8f,
                                     stiffness = 500f
                                 )
-                            ),
-                        updateFirstName = updateFirstName,
-                        updateLastName = updateLastName,
-                        updateEmail = updateEmail,
-                        updatePhoneNumber = updatePhoneNumber,
-                        onBackPressed = {
-                            reservationState = ReservationState.RESERVATION_INFORMATION
-                        },
-                    ) { reservationState = ReservationState.SUMMARY }
+                            )
+                            .fillMaxSize(),
+                        onBackPressed = { onBack() },
+                    )
                 }
 
                 else -> {
                     ReservationSummary(
                         uiState,
-                        modifier.animateContentSize(
-                            animationSpec = spring(
-                                dampingRatio = 0.8f,
-                                stiffness = 500f
+                        modifier
+                            .animateContentSize(
+                                animationSpec = spring(
+                                    dampingRatio = 0.8f,
+                                    stiffness = 500f
+                                )
                             )
-                        ),
+                            .fillMaxSize(),
                     ) {
-                        reservationState = ReservationState.PERSONAL_INFORMATION
+                        reservationState = ReservationState.RESERVATION_INFORMATION
                     }
                 }
             }
         }
-    }
+
+        BottomAppBar(modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .fillMaxWidth()
+        ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text(
+                            text = "Prix total",
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                        Text(
+                            text = uiState.totalPrice.toString() + " Fcfa",
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        )
+                    }
+//                    Spacer(modifier = Modifier.weight(1f))
+
+                    Button(
+                        modifier = Modifier.fillMaxHeight(),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 44.dp),
+                        onClick = { reservationState = ReservationState.SUMMARY }
+                    ) {
+                        Text(text = if (reservationState == ReservationState.RESERVATION_INFORMATION) "Suivant" else "Payer", style = MaterialTheme.typography.titleMedium)
+                    }
+
+                }
+            }
+        }
+
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun TopBar(title: Int = R.string.booking_details,  onBack: () -> Unit) {
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = stringResource(id = title),
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = { onBack() }) {
+                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null)
+            }
+        }
+    )
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReservationSummary(uiState: NomadUiState, modifier: Modifier, onBackPressed: () -> Unit) {
     val dates = Pair(
@@ -249,85 +218,162 @@ fun ReservationSummary(uiState: NomadUiState, modifier: Modifier, onBackPressed:
     )
 
     val today = remember {
-        LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE dd/MM/yyyy"))
+        LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE dd/MM/yyyy").withLocale(Locale.FRANCE))
     }
 
     val daysDifference = calculateDaysDifference(
-        uiState.selectedBookingDates.first!!,
-        uiState.selectedBookingDates.second!!
+        uiState.selectedBookingDates.first,
+        uiState.selectedBookingDates.second
     )
 
+    var selectedPaymentMethod by remember {
+        mutableStateOf(1)
+    }
 
     BackHandler(true) {
         onBackPressed()
     }
 
     Column(
-        modifier = modifier.padding(vertical = 32.dp, horizontal = 16.dp),
+        modifier = modifier,
+//            .height(IntrinsicSize.Max),
         horizontalAlignment = Alignment.Start
     ) {
 
-        InfoSection(
-            "Date",
-            today,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-
-        Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
-
-        InfoSection("Statut", "En attente", modifier = Modifier.fillMaxWidth())
-        Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
-
-        InfoSection(
-            "Réservé au nom de:",
-            uiState.personalInformation.fullName,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        Column(modifier = Modifier
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.surface)
+//            .border(
+//                width = 1.dp,
+//                shape = RoundedCornerShape(4.dp),
+//                color = MaterialTheme.colorScheme.outlineVariant
+//            )
+            .padding(vertical = 32.dp, horizontal = 16.dp),
         ) {
             InfoSection(
-                "Date d'arrivée",
-                dates.first,
-                modifier = Modifier.weight(1f)
+                "Date de réservation",
+                today,
+                modifier = Modifier.fillMaxWidth()
             )
+
+
+            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+
+            InfoSection("Statut", "En attente", modifier = Modifier.fillMaxWidth())
+            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+
             InfoSection(
-                "Date de départ",
-                dates.second,
-                modifier = Modifier.weight(1f)
+                "Réservé au nom de:",
+                uiState.personalInformation.fullName,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(100.dp)
+            ) {
+                InfoSection(
+                    "Date d'arrivée",
+                    dates.first,
+                    modifier = Modifier.weight(1f)
+                )
+                InfoSection(
+                    "Date de départ",
+                    dates.second,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+
+            InfoSection(
+                "Détails",
+                "$daysDifference nuit(s), 1 ${uiState.selectedRoomType.name.lowercase()}",
             )
         }
-
-        Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
-
-        InfoSection(
-            "Prix total",
-            "$daysDifference nuit, 1 chambre",
-            modifier = Modifier.weight(1f)
-        )
-
-        Divider()
-        Text(
-            text = "181.000 Fcfa",
-            color = MaterialTheme.colorScheme.secondary,
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
 
         Spacer(modifier = Modifier.height(40.dp))
+/*
 
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            contentPadding = PaddingValues(vertical = 16.dp),
-            onClick = { /*TODO*/ }
-        ) {
-            Text(text = "Procéder au paiment", style = MaterialTheme.typography.titleMedium)
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(
+                text = stringResource(id = R.string.payment_method),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Card(
+                modifier = Modifier
+                    .width(IntrinsicSize.Max)
+                    .clickable {
+                        selectedPaymentMethod = 1
+                    }
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = card1Color,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(end = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    RadioButton(
+                        selected = selectedRadio == 1,
+                        onClick = {
+                            selectedRadio = 1
+                            viewModel.updateTotalPrice(
+                                RoomType.SUITE,
+                                daysDifference
+                            )
+                        }
+                    )
+                    Text(
+                        text = "Suite",
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            Card(onClick = {}, modifier = Modifier.fillMaxWidth())  {
+                Text(
+                    text = "PayPal",
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+            }
+
+            Card(onClick = {}, modifier = Modifier.fillMaxWidth())  {
+                Text(
+                    text = "Airtel Money",
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+            }
+
+            Card(onClick = {}, modifier = Modifier.fillMaxWidth())  {
+                Text(
+                    text = "Moov Money",
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+            }
+
         }
+*/
+
     }
 }
 
@@ -354,121 +400,99 @@ private fun InfoSection(title: String, data: String, modifier: Modifier = Modifi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ReservationInformation(
+    uiState: NomadUiState,
     viewModel: NomadViewModel,
-    dateRangePickerState: DateRangePickerState,
     modifier: Modifier = Modifier,
-    updateDemand: (String) -> Unit,
-    onCheckInClick: () -> Unit,
-    onCheckOutClick: () -> Unit,
-    onNextStep: () -> Unit,
+    onBackPressed: () -> Unit,
 ) {
 
-    val uiState by viewModel.uiState.collectAsState()
-    var selectedRadio by rememberSaveable {
-        mutableIntStateOf(1)
+    val dateRangePickerState = rememberDateRangePickerState(
+        initialSelectedStartDateMillis = Instant.now().toEpochMilli(),
+        initialSelectedEndDateMillis = Instant.now().plus(Duration.ofDays(1)).toEpochMilli()
+    )
+
+    val numberOfDays = calculateDaysDifference(
+        dateRangePickerState.selectedStartDateMillis ?: uiState.selectedBookingDates.first,
+        dateRangePickerState.selectedEndDateMillis ?: uiState.selectedBookingDates.second
+    )
+
+    BackHandler(true) {
+        onBackPressed()
     }
 
-    val card1Color = if (selectedRadio == 1) {
-        MaterialTheme.colorScheme.primaryContainer
-    } else {
-        MaterialTheme.colorScheme.surface
-    }
-    val card1ContentColor = if (selectedRadio == 1) {
-        MaterialTheme.colorScheme.onPrimaryContainer
-    } else {
-        MaterialTheme.colorScheme.onSurface
+
+    var showDateRangePicker by remember { mutableStateOf(false) }
+
+    if (showDateRangePicker) {
+        DatePickerDialog(
+            onDismissRequest = {
+                showDateRangePicker = false
+                viewModel.updateTotalPrice(
+                    roomType = uiState.selectedRoomType,
+                    numberOfDays = numberOfDays
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDateRangePicker = !showDateRangePicker
+                    viewModel.updateBookingDates(
+                        Pair(
+                            dateRangePickerState.selectedStartDateMillis ?: uiState.selectedBookingDates.first,
+                            dateRangePickerState.selectedEndDateMillis ?: uiState.selectedBookingDates.second
+                        )
+                    )
+                    viewModel.updateTotalPrice(
+                        roomType = uiState.selectedRoomType,
+                        numberOfDays = numberOfDays
+                    )
+
+                }) {
+                    Text(text = stringResource(id = R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showDateRangePicker = false
+                    viewModel.updateTotalPrice(
+                        roomType = uiState.selectedRoomType,
+                        numberOfDays = numberOfDays
+                    )
+                }) {
+                    Text(text = stringResource(id = R.string.cancel))
+                }
+            },
+        ) {
+            DateRangePicker(
+                state = dateRangePickerState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .height(500.dp)
+            )
+        }
     }
 
-    val card2Color = if (selectedRadio == 2) {
-        MaterialTheme.colorScheme.primaryContainer
-    } else {
-        MaterialTheme.colorScheme.surface
-    }
-    val card2ContentColor = if (selectedRadio == 2) {
-        MaterialTheme.colorScheme.onPrimaryContainer
-    } else {
-        MaterialTheme.colorScheme.onSurface
-    }
+    Column(modifier = modifier
+        .padding(16.dp)
+        .verticalScroll(rememberScrollState())) {
 
-    Column(modifier = modifier.padding(16.dp)) {
-        HeaderSectionTitle(title = R.string.nomad_hotel)
-
-        Divider(thickness = 1.dp, modifier = Modifier.padding(vertical = 20.dp))
         DateSection(
             dateRangePickerState = dateRangePickerState,
-            onCheckInClick = { onCheckInClick() },
-            onCheckOutClick = { onCheckOutClick() }
+            uiState = uiState,
+            onClick = { showDateRangePicker = !showDateRangePicker },
         )
 
         Divider(thickness = 1.dp, modifier = Modifier.padding(vertical = 20.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Card(
-                modifier = Modifier
-                    .width(IntrinsicSize.Max)
-                    .clickable { selectedRadio = 1 }
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                colors = CardDefaults.cardColors(
-                    containerColor = card1Color,
-                    contentColor = card1ContentColor
-                )
-            ) {
-                Row(
-                    modifier = Modifier.padding(end = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    RadioButton(selected = selectedRadio == 1, onClick = { selectedRadio = 1 })
-                    Text(
-                        text = "Suite",
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
-
-            Card(
-                modifier = Modifier
-                    .weight(1f)
-                    .width(IntrinsicSize.Max)
-                    .clickable { selectedRadio = 2 }
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                colors = CardDefaults.cardColors(
-                    containerColor = card2Color,
-                    contentColor = card2ContentColor
-                )
-            ) {
-                Row(
-                    modifier = Modifier.padding(end = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    RadioButton(selected = selectedRadio == 2, onClick = { selectedRadio = 2 })
-                    Text(
-                        text = "Appartement",
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
-        }
+        RoomTypes(viewModel = viewModel, uiState = uiState)
 
         Divider(thickness = 1.dp, modifier = Modifier.padding(vertical = 20.dp))
-        GuestsSection(viewModel)
+        GuestsSection(uiState, viewModel)
 
         Divider(thickness = 1.dp, modifier = Modifier.padding(vertical = 20.dp))
         OutlinedTextField(
             value = uiState.particularDemand,
-            onValueChange = { updateDemand(it) },
+            onValueChange = { viewModel.updateParticularDemand(it) },
             label = { Text("Demande particulière") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -477,14 +501,126 @@ private fun ReservationInformation(
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        Button(
-            onClick = { onNextStep() },
-            shape = RoundedCornerShape(8.dp),
+        PersonalInformation(
+            uiState = uiState,
+            viewModel = viewModel,
+        )
+
+        Spacer(modifier = Modifier.height(80.dp))
+    }
+}
+
+@Composable
+private fun DialogDatePicker() {
+
+}
+
+@Composable
+private fun RoomTypes(viewModel: NomadViewModel, uiState: NomadUiState) {
+    val daysDifference = calculateDaysDifference(
+        uiState.selectedBookingDates.first,
+        uiState.selectedBookingDates.second
+    )
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        var selectedRadio by rememberSaveable {
+            mutableIntStateOf(1)
+        }
+
+        val card1Color = if (selectedRadio == 1) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            MaterialTheme.colorScheme.surface
+        }
+
+        val card2Color = if (selectedRadio == 2) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            MaterialTheme.colorScheme.surface
+        }
+
+
+        Card(
             modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .align(Alignment.End),
+                .width(IntrinsicSize.Max)
+                .clickable {
+                    selectedRadio = 1
+                    viewModel.updateTotalPrice(
+                        RoomType.SUITE,
+                        daysDifference
+                    )
+                }
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    shape = RoundedCornerShape(8.dp)
+                ),
+            colors = CardDefaults.cardColors(
+                containerColor = card1Color,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            )
         ) {
-            Text(text = "Suivant")
+            Row(
+                modifier = Modifier.padding(end = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                RadioButton(
+                    selected = selectedRadio == 1,
+                    onClick = {
+                        selectedRadio = 1
+                        viewModel.updateTotalPrice(
+                            RoomType.SUITE,
+                            daysDifference
+                        )
+                    }
+                )
+                Text(
+                    text = "Suite",
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier
+                .weight(1f)
+                .width(IntrinsicSize.Max)
+                .clickable {
+                    selectedRadio = 2
+                    viewModel.updateTotalPrice(
+                        RoomType.APPARTEMENT,
+                        daysDifference
+                    )
+                }
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    shape = RoundedCornerShape(8.dp)
+                ),
+            colors = CardDefaults.cardColors(
+                containerColor = card2Color,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            )
+        ) {
+            Row(
+                modifier = Modifier.padding(end = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                RadioButton(selected = selectedRadio == 2, onClick = {
+                    selectedRadio = 2
+                    viewModel.updateTotalPrice(
+                        RoomType.APPARTEMENT,
+                        daysDifference
+                    )})
+                Text(
+                    text = "Appartement",
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
     }
 }
@@ -492,90 +628,52 @@ private fun ReservationInformation(
 @Composable
 fun PersonalInformation(
     uiState: NomadUiState,
+    viewModel: NomadViewModel,
     modifier: Modifier = Modifier,
-    updateFirstName: (String) -> Unit,
-    updateLastName: (String) -> Unit,
-    updateEmail: (String) -> Unit,
-    updatePhoneNumber: (String) -> Unit,
-    onBackPressed: () -> Unit,
-    onSubmit: () -> Unit,
 ) {
-    BackHandler(true) {
-        onBackPressed()
-    }
+    Text(
+        text = stringResource(id = R.string.personalInformation),
+        style = MaterialTheme.typography.bodyLarge,
+        fontWeight = FontWeight.SemiBold
+    )
 
-    Column(
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
-    ) {
-        Text(
-            text = stringResource(id = R.string.personalInformation),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.SemiBold
-        )
+    Spacer(modifier = Modifier.height(8.dp))
+    OutlinedTextField(
+        value = uiState.personalInformation.firstName,
+        onValueChange = { viewModel.updateFirstName(it) },
+        label = { Text(stringResource(R.string.lastname)) },
+        leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
+        modifier = Modifier.fillMaxWidth(),
+    )
 
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = uiState.personalInformation.firstName,
-            onValueChange = { updateFirstName(it) },
-            label = { Text(stringResource(R.string.lastname)) },
-            leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
-        )
+    Spacer(modifier = Modifier.height(8.dp))
+    OutlinedTextField(
+        value = uiState.personalInformation.lastName,
+        onValueChange = { viewModel.updateLastName(it) },
+        label = { Text(stringResource(R.string.firstname)) },
+        leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
+        modifier = Modifier.fillMaxWidth()
 
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = uiState.personalInformation.lastName,
-            onValueChange = { updateLastName(it) },
-            label = { Text(stringResource(R.string.firstname)) },
-            leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
+    )
 
-        )
+    Spacer(modifier = Modifier.height(8.dp))
+    OutlinedTextField(
+        value = uiState.personalInformation.email,
+        onValueChange = { viewModel.updateEmail(it) },
+        label = { Text(stringResource(R.string.email)) },
+        leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = null) },
+        modifier = Modifier.fillMaxWidth()
+    )
 
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = uiState.personalInformation.email,
-            onValueChange = { updateEmail(it) },
-            label = { Text(stringResource(R.string.email)) },
-            leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
-        )
+    Spacer(modifier = Modifier.height(8.dp))
+    OutlinedTextField(
+        value = uiState.personalInformation.phoneNumber,
+        onValueChange = { viewModel.updatePhoneNumber(it) },
+        label = { Text(stringResource(R.string.phoneNumber)) },
+        leadingIcon = { Icon(imageVector = Icons.Default.Phone, contentDescription = null) },
+        modifier = Modifier.fillMaxWidth()
+    )
 
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = uiState.personalInformation.phoneNumber,
-            onValueChange = { updatePhoneNumber(it) },
-            label = { Text(stringResource(R.string.phoneNumber)) },
-            leadingIcon = { Icon(imageVector = Icons.Default.Phone, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedButton(
-                shape = RoundedCornerShape(8.dp),
-                onClick = onBackPressed,
-            ) {
-                Text(text = "Précédent")
-            }
-
-
-            Button(
-                onClick = { onSubmit() },
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier
-            ) {
-                Text(text = "Suivant", modifier = Modifier.padding(horizontal = 8.dp))
-            }
-        }
-    }
 }
 
 
@@ -583,17 +681,14 @@ fun PersonalInformation(
 @Composable
 fun DateSection(
     dateRangePickerState: DateRangePickerState,
-    onCheckInClick: () -> Unit,
-    onCheckOutClick: () -> Unit
-) {
+    uiState: NomadUiState,
+    onClick: () -> Unit,
+    ) {
 
-    val numberOfDays = remember {
-        mutableIntStateOf(dateRangePickerState.selectedStartDateMillis?.let { startDate ->
-            dateRangePickerState.selectedEndDateMillis?.let { endDate ->
-                calculateDaysDifference(startDate, endDate)
-            }
-        }?.toInt() ?: -1)
-    }
+    val daysDifference = calculateDaysDifference(
+        uiState.selectedBookingDates.first,
+        uiState.selectedBookingDates.second
+    )
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -608,7 +703,7 @@ fun DateSection(
                     MaterialTheme.colorScheme.primaryContainer,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .clickable { onCheckInClick() }
+                .clickable { onClick() }
                 .padding(8.dp)
                 .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -616,7 +711,7 @@ fun DateSection(
             Text(
                 text = dateRangePickerState.selectedStartDateMillis?.let { millis ->
                     formatLongToDate(millis)
-                } ?: LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE\ndd/MM/yyyy")),
+                } ?: uiState.selectedBookingDates.first.toString(),
                 maxLines = 2,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold,
@@ -630,11 +725,11 @@ fun DateSection(
         }
 
         Text(
-            text = numberOfDays.intValue.let {
-                if (it == 1) {
+            text = daysDifference.run {
+                if (this.toInt() == 1) {
                     "1 nuit"
-                } else if (it > 1) {
-                    "$it\nnuits"
+                } else if (this > 1) {
+                    "$this\nnuits"
                 } else {
                     "En\nattente"
                 }
@@ -655,7 +750,7 @@ fun DateSection(
                     MaterialTheme.colorScheme.primaryContainer,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .clickable { onCheckOutClick() }
+                .clickable { onClick() }
                 .padding(8.dp)
                 .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -664,8 +759,7 @@ fun DateSection(
             Text(
                 text = dateRangePickerState.selectedEndDateMillis?.let { millis ->
                     formatLongToDate(millis)
-                } ?: LocalDate.now().plusDays(1)
-                    .format(DateTimeFormatter.ofPattern("EEEE\ndd/MM/yyyy")),
+                } ?: uiState.selectedBookingDates.second.toString(),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
@@ -681,14 +775,10 @@ fun DateSection(
 }
 
 @Composable
-private fun GuestsSection(viewModel: NomadViewModel) {
-
-    val uiState by viewModel.uiState.collectAsState()
-
-    val numberOfGuests by remember { derivedStateOf { uiState.numberOfGuests } }
-    val decreaseNumberOfGuests = remember(viewModel) { { viewModel.decreaseNumberOfGuests() } }
-    val increaseNumberOfGuests = remember(viewModel) { { viewModel.increaseNumberOfGuests() } }
-
+private fun GuestsSection(
+    uiState: NomadUiState,
+    viewModel: NomadViewModel,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -704,18 +794,18 @@ private fun GuestsSection(viewModel: NomadViewModel) {
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(onClick = decreaseNumberOfGuests) {
+            TextButton(onClick = viewModel::decreaseNumberOfGuests) {
                 Text(text = "-", fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
             }
 
             Text(
-                text = numberOfGuests.toString(),
+                text = uiState.numberOfGuests.toString(),
                 style = MaterialTheme.typography
                     .bodyLarge
                     .copy(color = MaterialTheme.colorScheme.inversePrimary)
             )
 
-            TextButton(onClick = increaseNumberOfGuests) {
+            TextButton(onClick = viewModel::increaseNumberOfGuests) {
                 Text(text = "+", fontSize = 20.sp, color = MaterialTheme.colorScheme.primary)
             }
         }
@@ -723,10 +813,10 @@ private fun GuestsSection(viewModel: NomadViewModel) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "id:pixel_7", showSystemUi = true)
 @Composable
 fun BookingDetailsPreview() {
     BookingDetails(
         viewModel = NomadViewModel()
-    )
+    ) {}
 }

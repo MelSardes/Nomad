@@ -1,17 +1,34 @@
 package com.mukite.nomad.ui
 
 import androidx.lifecycle.ViewModel
-import com.mukite.nomad.data.model.NomadUiState
+import com.mukite.nomad.data.NomadUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+enum class RoomType(val price: Int) {
+    SUITE(281000), APPARTEMENT(181000)
+}
+
+
 class NomadViewModel : ViewModel() {
+
     private val _uiState = MutableStateFlow(NomadUiState())
     val uiState: StateFlow<NomadUiState> = _uiState.asStateFlow()
 
 
+    fun updateTotalPrice(roomType: RoomType, numberOfDays: Long) {
+        _uiState.update {
+            it.copy(
+                totalPrice = calculateTotalPrice(numberOfDays, roomType)
+            )
+        }
+    }
+
+    private fun calculateTotalPrice(numberOfDays: Long, roomType: RoomType): Long {
+        return numberOfDays * roomType.price
+    }
 
     fun updateUiState(newUiState: NomadUiState) {
         _uiState.value = newUiState
@@ -37,7 +54,7 @@ class NomadViewModel : ViewModel() {
         }
     }
 
-    fun updateBookingDates(selectedDates: Pair<Long?, Long?>) {
+    fun updateBookingDates(selectedDates: Pair<Long, Long>) {
         _uiState.update {
             it.copy(selectedBookingDates = selectedDates)
         }
@@ -78,4 +95,5 @@ class NomadViewModel : ViewModel() {
             currentValue.copy(showBottomBar = showBottomBar)
         }
     }
+
 }

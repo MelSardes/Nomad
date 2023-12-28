@@ -38,4 +38,6 @@
     <string name="user_profile_name">Morriss Morrisson</string>
     <string name="user_profile_location">Libreville, Estuaire</string>
     <string name="user_profile_email">morrissmorrisson01@gmail.com</string>
+    <string name="booking_details">Détails de la réservation</string>
+    <string name="payment_method">Méthode de paiement</string>
 </resources>

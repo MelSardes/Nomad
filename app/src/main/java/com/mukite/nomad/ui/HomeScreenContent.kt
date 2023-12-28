@@ -50,6 +50,8 @@ import com.mukite.nomad.data.datasource.DataSource
 import com.mukite.nomad.data.model.Service
 import com.mukite.nomad.utils.HtmlText
 import com.mukite.nomad.utils.IFrameContent
+import com.mukite.nomad.utils.MapScreen
+import com.mukite.nomad.utils.MapView
 import com.mukite.nomad.utils.WebViewScreen
 
 
@@ -105,17 +107,16 @@ fun HeaderSection() {
 @Composable
 fun MapSection(modifier: Modifier) {
     Column(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.Start
     ) {
         HeaderSectionTitle(title = R.string.location)
 
         Spacer(modifier = Modifier.height(8.dp))
-        Box(modifier = Modifier, contentAlignment = Alignment.Center) {
-            //WebViewScreen(modifier = Modifier.fillMaxSize())
-            IFrameContent(modifier = Modifier.fillMaxSize())
-        }
+//        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+        MapScreen(modifier = Modifier.weight(1f).height(IntrinsicSize.Max))
+//        }
     }
 }
 
@@ -253,7 +254,7 @@ fun HeaderSectionTitle(@StringRes title: Int, @StringRes link: Int? = null) {
 }
 
 
-private val galleryImages = listOf(
+val galleryImages = listOf(
     R.drawable.gallerie1,
     R.drawable.gallerie2,
     R.drawable.gallerie3,
