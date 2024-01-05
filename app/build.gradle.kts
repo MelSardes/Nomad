@@ -59,6 +59,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("androidx.navigation:navigation-common-ktx:2.7.6")
     implementation("androidx.navigation:navigation-runtime-ktx:2.7.6")
@@ -73,4 +74,6 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     implementation("androidx.webkit:webkit:1.9.0")
+
+    implementation("com.airbnb.android:lottie-compose:5.2.0")
 }

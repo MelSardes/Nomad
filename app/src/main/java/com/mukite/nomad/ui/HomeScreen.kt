@@ -1,7 +1,7 @@
 package com.mukite.nomad.ui
 
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,14 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -29,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,7 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mukite.nomad.R
-import com.mukite.nomad.utils.MapView
 
 
 @Composable
@@ -50,6 +44,16 @@ fun HomeScreen(
     navigateToDateSelection: () -> Unit,
 ) {
     val verticalScrollState = rememberScrollState()
+    val dialogImageViewerOpened = remember { mutableStateOf(false) }
+    var selectedImage by remember {
+        mutableIntStateOf(0)
+    }
+
+    AnimatedVisibility(visible = dialogImageViewerOpened.value) {
+        DialogImageViewer(selectedImage) {
+            dialogImageViewerOpened.value = false
+        }
+    }
 
     Column(
         modifier = modifier
@@ -60,13 +64,21 @@ fun HomeScreen(
         HeaderImage(modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(14.dp))
 
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
 
             HeaderSection()
-            Spacer(modifier = Modifier.height(32.dp))
 
+            Spacer(modifier = Modifier.height(32.dp))
+            NewsSection(modifier = Modifier.fillMaxWidth())
+
+            Spacer(modifier = Modifier.height(32.dp))
+            WeatherSection(modifier = Modifier.fillMaxWidth())
+
+            Spacer(modifier = Modifier.height(32.dp))
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(16.dp),
@@ -80,7 +92,7 @@ fun HomeScreen(
                     fontWeight = FontWeight.SemiBold
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(24.dp))
             Divider(color = Color.Black.copy(alpha = 0.2f))
 
@@ -88,12 +100,15 @@ fun HomeScreen(
             DescriptionSection()
 
             Spacer(modifier = Modifier.height(24.dp))
-            GallerySection(modifier = Modifier.fillMaxWidth())
+            GallerySection(modifier = Modifier.fillMaxWidth()) {
+                dialogImageViewerOpened.value = true
+                selectedImage = it
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
             ServicesSection(modifier = Modifier.fillMaxWidth())
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(204.dp))
             MapSection(modifier = Modifier.height(200.dp).fillMaxWidth())
         }
     }
@@ -120,7 +135,7 @@ fun TabItem(icon: ImageVector, index: Int, selectedIndex: Int, modifier: Modifie
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true, device = "id:small_phone")
 @Composable
 fun HomeScreenPreview() {
     HomeScreen {}

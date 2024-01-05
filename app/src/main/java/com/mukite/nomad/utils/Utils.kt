@@ -1,6 +1,7 @@
 package com.mukite.nomad.utils
 
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -23,4 +24,10 @@ fun calculateDaysDifference(startTimestamp: Long, endTimestamp: Long): Long {
         .toLocalDate()
 
     return endDate.toEpochDay() - startDate.toEpochDay()
+}
+
+
+fun generateNext4Days(): List<LocalDate> {
+    val today = LocalDate.now()
+    return (0 until 4).map { today.plusDays(it.toLong()) }
 }

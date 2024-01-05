@@ -1,7 +1,9 @@
 package com.mukite.nomad.data.datasource
 
+import com.mukite.nomad.R
 import com.mukite.nomad.data.model.Booking
 import com.mukite.nomad.data.model.BookingStatus
+import com.mukite.nomad.data.model.News
 import com.mukite.nomad.data.model.Service
 
 
@@ -92,6 +94,27 @@ object DataSource {
             reservationCode = "#F7d8P2",
             roomType = "Standard",
         ),
+    )
+
+    val newsList = listOf(
+        News(
+            title = R.string.articleNews1_title,
+            description = R.string.articleNews1_description,
+            image = R.drawable.article_image1,
+            date = R.string.articleNews1_date
+        ),
+        News(
+            title = R.string.articleNews2_title,
+            description = R.string.articleNews2_description,
+            image = R.drawable.article_image2,
+            date = R.string.articleNews2_date
+        ),
+        News(
+            title = R.string.articleNews3_title,
+            description = R.string.articleNews3_description,
+            image = R.drawable.article_image3,
+            date = R.string.articleNews3_date,
+        )
     )
 }
 

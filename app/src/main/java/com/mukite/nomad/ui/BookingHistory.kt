@@ -87,7 +87,7 @@ private fun TopBar() {
 
 @Composable
 private fun BookingList(selectedChip: Int, scrollState: ScrollState) {
-    Column(modifier = Modifier.verticalScroll(scrollState)) {
+    Column(modifier = Modifier.fillMaxSize().verticalScroll(scrollState), verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
         when (selectedChip) {
             0 -> {
@@ -131,7 +131,11 @@ val chipsTags = listOf(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun ChipsOptions(selectedChip: Int, modifier: Modifier = Modifier, onChipSelected: (Int) -> Unit) {
+private fun ChipsOptions(
+    selectedChip: Int,
+    modifier: Modifier = Modifier,
+    onChipSelected: (Int) -> Unit
+) {
 
     Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         chipsTags.forEachIndexed { index, chipTag ->
@@ -140,10 +144,9 @@ private fun ChipsOptions(selectedChip: Int, modifier: Modifier = Modifier, onChi
                 onClick = { onChipSelected(index) },
                 label = { Text(chipTag) },
                 colors = InputChipDefaults.inputChipColors(
-                    containerColor = if (selectedChip == index)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
                 )
             )
         }
@@ -158,6 +161,7 @@ fun BookingCard(booking: Booking, modifier: Modifier = Modifier) {
         onClick = { /*TODO*/ },
         modifier = modifier.height(IntrinsicSize.Max),
         colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(modifier = Modifier
             .fillMaxSize()
@@ -179,12 +183,9 @@ fun BookingCard(booking: Booking, modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column(modifier = Modifier.fillMaxSize()) {
-                Text(
-                    text = booking.hotel,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
-                )
-
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 4.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -196,7 +197,7 @@ fun BookingCard(booking: Booking, modifier: Modifier = Modifier) {
                             textAlign = TextAlign.Start,
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Medium,
-                                color = Color.Green
+                                color = MaterialTheme.colorScheme.tertiary
                             )
                         )
                         Text(
@@ -212,11 +213,11 @@ fun BookingCard(booking: Booking, modifier: Modifier = Modifier) {
                             textAlign = TextAlign.Start,
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.error
+                                color = MaterialTheme.colorScheme.tertiary
                             )
                         )
                         Text(
-                            text = booking.checkIn,
+                            text = booking.checkOut,
                             textAlign = TextAlign.Start,
                             style = MaterialTheme.typography.labelLarge
                         )

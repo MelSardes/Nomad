@@ -10,7 +10,8 @@
     <string name="photo_gallery">Galerie photos</string>
     <string name="see_all">Tout voir</string>
     <string name="details">Détails</string>
-    <string name="nomad_hotel_description">LA SOLUTION POUR VOS VOYAGES D’AFFAIRES AU GABON\nUn hôtel d’exception, à la fois proche et délicieusement à l’abri du temps. Un lieu qui cultive en toute discrétion l’excellence, l’authenticité et la simplicité.\n\nEn franchissant les portes du NOMAD, un havre de paix s’invite pour les séjours professionnels comme pour les séjours détentes.\nL’hôtel NOMAD vous offre un service personnalisé et une prestation haut de gamme.\n\nTous les jours, toute l\'année, pour chaque séjour.\n\nBienvenue au NOMAD...</string>
+    <string name="nomad_hotel_description_short">LA SOLUTION POUR VOS VOYAGES D’AFFAIRES AU GABON\nUn hôtel d’exception, à la fois proche et délicieusement à l’abri du temps. Un lieu qui cultive en toute discrétion l’excellence, l’authenticité et la simplicité ... </string>
+    <string name="nomad_hotel_description_expanded">LA SOLUTION POUR VOS VOYAGES D’AFFAIRES AU GABON\nUn hôtel d’exception, à la fois proche et délicieusement à l’abri du temps. Un lieu qui cultive en toute discrétion l’excellence, l’authenticité et la simplicité.\n\nEn franchissant les portes du NOMAD, un havre de paix s’invite pour les séjours professionnels comme pour les séjours détentes.\nL’hôtel NOMAD vous offre un service personnalisé et une prestation haut de gamme.\n\nTous les jours, toute l\'année, pour chaque séjour.\n\nBienvenue au NOMAD</string>
     <string name="see_more">Voir plus</string>
     <string name="description">Description</string>
     <string name="airportWelcome">Accueil aéroport</string>
@@ -40,4 +41,15 @@
     <string name="user_profile_email">morrissmorrisson01@gmail.com</string>
     <string name="booking_details">Détails de la réservation</string>
     <string name="payment_method">Méthode de paiement</string>
+    <string name="nomad_hotel_full_name">Résidence Hotellerie Nomad</string>
+    <string name="articleNews1_description">Le Premier ministre gabonais, Julien Nkoghe Bekalé, a ouvert mardi 23 avril un dialogue social, en présence de l’ensemble des principaux syndicats du pays. Objectif : créer un consensus national sur les mesures à mettre en oeuvre pour redresser le pays.\n\nTrès forte affluence hier pour la cérémonie d’ouverture du dialogue social à l’hôtel Nomad Suites Résidence, au nord de Libreville. Tous les syndicats et centrales syndicales du pays étaient en effet présent pour cette grand-messe.\n\nPour le gouvernement, il s’agit sans conteste d’un joli tour de force. « Il y a quelques semaines, cela aurait été impensable », concède une des grandes figures du mouvement syndical au Gabon.</string>
+    <string name="articleNews1_title">OUVERTURE DU DIALOGUE SOCIAL AU NOMAD SUITES RÉSIDENCE</string>
+    <string name="articleNews2_title">RÉUNION - CLUB TOURISME DE LIBREVILLE/MINISTRE DU TOURISME AU NOMAD</string>
+    <string name="articleNews3_title">LE NOMAD, NOUVEAU PARTENAIRE DE LA LINAFP</string>
+    <string name="articleNews1_date">Le 08-04-2019</string>
+    <string name="articleNews2_date">Le 08-04-2019</string>
+    <string name="articleNews3_date">Le 24-02-2019</string>
+    <string name="articleNews2_description">Le Nomad, Radio Gabon et SitiMobile ont rejoint le giron des partenaires de la Ligue nationale de football professionnel (Linafp), conformément aux conventions signées le 19 février à Libreville. Cet engagement tiendra sur une saison expérimentale, 2018-2019, et sera renouvelé en cas de succès.«Le Nomad, déjà présent dans le sport et qui a manifesté un grand intérêt à travailler avec le football professionnel gabonais, nous aidera lorsque ce sera nécessaire, dans l’organisation de nos évènements et loger nos équipes ou encore nos partenaires sur le plan national et international», a déclaré Brice Mbika Djambou. Selon la Linafp, l’engagement signé avec les trois partenaires tiendra sur une saison expérimentale, 2018-2019, et sera renouvelé en cas de succès.À cette occasion, le président de la Linafp a décliné l’apport de chaque partenaire. S’agissant de Radio Gabon, «la diffusion des matchs et émissions en direct permettra à notre ligue de bénéficier d’une plus grande couverture de ses compétitions et, de manière indirecte, assurer une visibilité de ses partenaires et sponsors», a expliqué Brice Mbika Djambou dans L’Union du 20 février.Selon le patron de la Linafp, la convention avec SitiMobile permettra «l’installation du service Mobiserv, pour certaines de nos actions comme les jeux-concours, les tombolas et l’annonce des résultats». À travers le partenariat signé avec la Linafp, le complexe hôtelier Le Nomad, quant à lui, est devenu l’hébergeur officiel de la ligue.</string>
+    <string name="articleNews3_description">Le Nomad, Radio Gabon et SitiMobile ont rejoint le giron des partenaires de la Ligue nationale de football professionnel (Linafp), conformément aux conventions signées le 19 février à Libreville.</string>
+    <string name="splash">Splash Screen</string>
 </resources>

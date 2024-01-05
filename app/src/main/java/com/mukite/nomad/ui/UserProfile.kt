@@ -1,7 +1,10 @@
 package com.mukite.nomad.ui
 
+import android.app.Activity
+import android.app.ActivityManager
 import android.media.Image
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
@@ -27,6 +30,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Notifications
@@ -40,6 +44,7 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -51,24 +56,30 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TopAppBarState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.mukite.nomad.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,6 +89,9 @@ fun UserProfile(
     listScrollState: ScrollState,
     modifier: Modifier = Modifier
 ) {
+
+    val activity = (LocalContext.current as? Activity)
+    val exitModalShown = remember { mutableStateOf(false) }
 
     Surface {
         Column(modifier.padding(horizontal = 16.dp)) {
@@ -101,7 +115,11 @@ fun UserProfile(
 
                 settingList.forEach {
                     if (it.second == "Se deconnecter") {
-                        SettingItem(it.first, it.second, exitColor = MaterialTheme.colorScheme.error)
+                        SettingItem(
+                            it.first,
+                            it.second,
+                            exitColor = MaterialTheme.colorScheme.error
+                        ) { exitModalShown.value = true }
                     } else SettingItem(it.first, it.second)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -109,14 +127,40 @@ fun UserProfile(
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
+
+        AnimatedVisibility(visible = exitModalShown.value) {
+            AlertDialog(
+                title = {
+                    Text(text = "Se deconnecter")
+                },
+                icon = {
+                    Icon(Icons.Filled.ExitToApp, contentDescription = "Exit")
+                },
+                text = {
+                    Text(text = "Voulez-vous vraiment vous deconnecter ?")
+                },
+                onDismissRequest = { exitModalShown.value = false },
+                confirmButton = {
+                    Row {
+                        TextButton(
+                            onClick = { exitModalShown.value = false }
+                        ) { Text("Annuler", color = MaterialTheme.colorScheme.secondary) }
+
+                        TextButton(onClick = { activity?.finish() }
+                        ) { Text("Se déconnecter") }
+                    }
+                },
+            )
+        }
+
     }
 }
 
 val settingList = listOf(
     Icons.Filled.Person to "Modifier le profil",
-    Icons.Filled.List to "Paiements",
+    Icons.Filled.List to "Mon historique",
     Icons.Filled.Notifications to "Notifications",
-    Icons.Filled.Info to "Aide",
+    Icons.Filled.Help to "Aide",
     Icons.Filled.Warning to "FAQ",
     Icons.Filled.Info to "A propos",
     Icons.Filled.ExitToApp to "Se deconnecter",
@@ -128,9 +172,10 @@ fun SettingItem(
     icon: ImageVector,
     title: String,
     modifier: Modifier = Modifier,
-    exitColor: Color = MaterialTheme.colorScheme.onSurface
+    exitColor: Color = MaterialTheme.colorScheme.onSurface,
+    onClick: () -> Unit = {}
 ) {
-    Card(onClick = {} ) {
+    Card(onClick = { onClick() } ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -143,9 +188,10 @@ fun SettingItem(
                 text = title,
                 textAlign = TextAlign.Start,
                 style = MaterialTheme.typography.titleSmall.copy(
-                fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.Medium,
                     color = exitColor
-            ))
+                )
+            )
         }
     }
 }
@@ -205,9 +251,10 @@ fun ProfileSection(modifier: Modifier = Modifier) {
 fun ProfilePhotoSection(modifier: Modifier = Modifier) {
     Box(modifier = modifier
         .size(150.dp)
-        .clip(RoundedCornerShape(24.dp))) {
+        .clip(CircleShape)
+    ) {
         Image(
-            painter = painterResource(id = R.drawable.nomad_main),
+            painter = painterResource(id = R.drawable.avatar),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,

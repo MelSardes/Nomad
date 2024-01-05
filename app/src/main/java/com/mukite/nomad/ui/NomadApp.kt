@@ -21,6 +21,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -33,19 +34,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 import com.mukite.nomad.R
+import com.mukite.nomad.SplashScreen
 import com.mukite.nomad.ui.booking_details.BookingDetails
 
 enum class NomadScreen(@StringRes val title: Int) {
+    Splash(title = R.string.splash),
     Home(title = R.string.app_name),
     HotelDetails(title = R.string.hotel),
     BookingDetails(title = R.string.reservation_details),
@@ -86,7 +91,7 @@ val bottomNavigationItems = listOf(
 )
 
 @Composable
-fun LeNomadBottomNavigationBar(
+fun NomadBottomNavigationBar(
     currentDestination: NavDestination?,
     navigateToPage: (String) -> Unit
 ) {
@@ -97,14 +102,16 @@ fun LeNomadBottomNavigationBar(
                 label = {
                     Text(
                         stringResource(screen.resourceId),
-                        color = MaterialTheme.colorScheme.primary
+                        fontWeight = FontWeight.SemiBold,
+//                        color = MaterialTheme.colorScheme.primary
                     )
                 },
                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                 onClick = { navigateToPage(screen.route) },
                 colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = MaterialTheme.colorScheme.secondary,
-                    selectedIconColor = MaterialTheme.colorScheme.onSecondary
+                    indicatorColor = MaterialTheme.colorScheme.primary,
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
                 )
             )
         }
@@ -146,10 +153,7 @@ fun NomadApp(
     val shouldShowBottomBar = remember { mutableStateOf(false) }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = remember {
-        navBackStackEntry?.destination
-    }
-
+    val currentDestination = navBackStackEntry?.destination
 
 
     Scaffold(
@@ -174,7 +178,7 @@ fun NomadApp(
 
             if (shouldShowBottomBar.value) {
 
-                LeNomadBottomNavigationBar(
+                NomadBottomNavigationBar(
                     currentDestination = currentDestination,
                     navigateToPage = { route ->
                         navController.navigate(route) {
@@ -253,13 +257,23 @@ private fun NomadNavContent(
 
     NavHost(
         navController = navController,
-        startDestination = NomadScreen.Home.name,
+        startDestination = NomadScreen.Splash.name,
         modifier = Modifier.padding(innerPadding),
 //        enterTransition = { fadeIn(animationSpec = tween(700)) },
 //        exitTransition = { fadeOut(animationSpec = tween(700)) },
 //        popEnterTransition = { fadeIn(animationSpec = tween(700)) },
 //        popExitTransition = { fadeOut(animationSpec = tween(700)) },
     ) {
+
+        composable(route = NomadScreen.Splash.name) {
+            SplashScreen() {
+                navController.navigate(NomadScreen.Home.name){
+                    launchSingleTop = true
+                    navController.popBackStack(NomadScreen.Splash.name, inclusive = true)
+                }
+            }
+        }
+
         composable(route = BottomNavigationItem.Home.route) {
 //                Text(text = "Home")
             HomeScreen(modifier = Modifier.fillMaxSize()) {
