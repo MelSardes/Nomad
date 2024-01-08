@@ -76,4 +76,9 @@ dependencies {
     implementation("androidx.webkit:webkit:1.9.0")
 
     implementation("com.airbnb.android:lottie-compose:5.2.0")
+
+    implementation("androidx.media3:media3-exoplayer:1.2.0")
+    implementation("androidx.media3:media3-ui:1.2.0")
+    implementation("androidx.media3:media3-common:1.2.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.27.0")
 }

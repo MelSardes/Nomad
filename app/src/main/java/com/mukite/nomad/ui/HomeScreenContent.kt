@@ -31,14 +31,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -60,8 +65,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.net.toUri
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player.REPEAT_MODE_OFF
+import androidx.media3.common.Player.REPEAT_MODE_ONE
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultDataSourceFactory
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.SimpleExoPlayer
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.PlayerView
 import com.mukite.nomad.R
 import com.mukite.nomad.data.datasource.DataSource
 import com.mukite.nomad.data.datasource.DataSource.newsList
@@ -75,35 +92,105 @@ import java.util.Locale
 
 
 @Composable
-fun HeaderSection() {
+fun HeaderSection(modifier: Modifier = Modifier) {
+/*
+    val context = LocalContext.current
 
-    Text(
-        text = stringResource(R.string.nomad_hotel_full_name),
-        color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.headlineMedium,
-        fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.fillMaxWidth()
-    )
+    val mediaItem = MediaItem.Builder()
+        .setUri("asset:///nomad_hotel")
+        .build()
 
-    Row(
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.Bottom
+    val exoPlayer = remember(context, mediaItem) {
+        ExoPlayer.Builder(context)
+            .build()
+            .also { exoPlayer ->
+                exoPlayer.setMediaItem(mediaItem)
+                exoPlayer.prepare()
+                exoPlayer.playWhenReady = true
+                exoPlayer.repeatMode = REPEAT_MODE_ONE
+            }
+    }
+
+    DisposableEffect(
+        AndroidView(factory = {
+            PlayerView(context).apply {
+                player = exoPlayer
+            }
+        })
     ) {
-        Image(
-            imageVector = Icons.Rounded.LocationOn,
-            contentDescription = null,
-            modifier = Modifier
-                .padding(end = 4.dp)
-                .size(12.dp)
+        onDispose { exoPlayer.release() }
+    }
+*/
+
+
+    Column(modifier = modifier) {
+        Text(
+            text = stringResource(R.string.nomad_hotel_full_name),
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Text(
-            text = "Quartier de l'aéroport, B.P. 8580, Libreville - Gabon",
-            style = MaterialTheme.typography.labelSmall
-        )
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Image(
+                imageVector = Icons.Rounded.LocationOn,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(end = 4.dp)
+                    .size(12.dp)
+            )
+
+            Text(
+                text = "Quartier de l'aéroport, B.P. 8580, Libreville - Gabon",
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
     }
 }
 
+@androidx.annotation.OptIn(UnstableApi::class) @Composable
+fun VideoPlayer(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val videoPath = "android.resource://${context.packageName}/${R.raw.nomad_hotel}"
+    // Create a SimpleExoPlayer
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context).build().apply {
+            setMediaItem(MediaItem.fromUri(videoPath.toUri()))
+            prepare()
+            play()
+            volume = 0f
+            repeatMode = REPEAT_MODE_ONE
+        }
+    }
+
+    // Create a PlayerView for ExoPlayer
+    val playerView = remember {
+        PlayerView(context).apply {
+            player = exoPlayer
+            resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+            useController = false
+        }
+    }
+
+    // Use AndroidView to integrate PlayerView into Compose
+    AndroidView(
+        factory = { playerView },
+        modifier = modifier
+    ) { view ->
+        // Do nothing here, AndroidView handles the view creation
+    }
+
+    // Remember to release the ExoPlayer when the Composable is disposed
+    DisposableEffect(Unit) {
+        onDispose {
+            exoPlayer.release()
+        }
+    }
+}
 
 @Composable
 fun MapSection(modifier: Modifier) {
@@ -126,66 +213,65 @@ fun MapSection(modifier: Modifier) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ServicesSection(modifier: Modifier = Modifier) {
-    Column {
+    Column(modifier = modifier) {
         HeaderSectionTitle(title = R.string.services)
         Spacer(modifier = Modifier.height(8.dp))
 
-        FlowRow(
-            modifier = modifier
+        Row(
+            modifier = Modifier
+                .horizontalScroll(rememberScrollState())
                 .fillMaxWidth()
                 .height(IntrinsicSize.Max),
-            verticalArrangement = Arrangement.spacedBy(30.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            maxItemsInEachRow = 4
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
+            Spacer(modifier = Modifier.width(10.dp))
             DataSource.servicesDataSource.forEach { service ->
                 ServiceItem(
                     modifier = Modifier,
                     service = service
                 )
             }
+            Spacer(modifier = Modifier.width(10.dp))
         }
     }
 }
 
 @Composable
 fun ServiceItem(modifier: Modifier = Modifier, service: Service) {
-    Column(
-        modifier = modifier
-            .size(80.dp)
-            .shadow(
-                2.dp,
-                spotColor = MaterialTheme.colorScheme.onSurface,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
-            .padding(8.dp)
-        ,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Surface(
+        modifier = modifier.size(72.dp),
+        tonalElevation = 0.1.dp,
+        shape = RoundedCornerShape(4.dp),
     ) {
-        Icon(
-            painter = painterResource(id = service.icon),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = stringResource(id = service.name),
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 2,
-            textAlign = TextAlign.Center,
-            softWrap = true,
+        Column(
             modifier = Modifier
-        )
+                .fillMaxSize()
+                .padding(8.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.Start,
+        ) {
+            Icon(
+                painter = painterResource(id = service.icon),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = stringResource(id = service.name),
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                softWrap = true,
+                modifier = Modifier
+            )
+        }
     }
 }
 
 @Composable
-fun DescriptionSection() {
+fun DescriptionSection(modifier: Modifier = Modifier) {
     var isContentHidden by rememberSaveable { mutableStateOf(true) }
 
-    Column {
+    Column(modifier  = modifier) {
         HeaderSectionTitle(title = R.string.description)
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -297,7 +383,7 @@ fun HeaderSectionTitle(@StringRes title: Int, @StringRes link: Int? = null) {
     ) {
         Text(
             text = stringResource(id = title),
-            color = MaterialTheme.colorScheme.secondary,
+//            color = MaterialTheme.colorScheme.secondary,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold
         )
@@ -325,17 +411,22 @@ fun NewsSectionPreview() {
 fun NewsSection(modifier: Modifier = Modifier) {
 
     Row(modifier = modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Spacer(modifier = Modifier.width(4.dp))
         newsList.forEach {
             NewsItem(news = it, modifier = Modifier.width(280.dp))
         }
+        Spacer(modifier = Modifier.width(4.dp))
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsItem(news: News, modifier: Modifier = Modifier) {
-    Surface(modifier = modifier.height(90.dp), tonalElevation = 2.dp, shape = RoundedCornerShape(8.dp)) {
+    Card(modifier = modifier.height(90.dp), elevation = CardDefaults.cardElevation(2.dp), shape = RoundedCornerShape(8.dp), onClick = {}) {
         Row {
-            Box(modifier = Modifier.fillMaxHeight().width(100.dp)) {
+            Box(modifier = Modifier
+                .fillMaxHeight()
+                .width(100.dp)) {
                 Image(
                     painter = painterResource(id = news.image),
                     contentDescription = null,
@@ -347,7 +438,9 @@ fun NewsItem(news: News, modifier: Modifier = Modifier) {
             }
             Spacer(modifier = Modifier.width(8.dp))
             Column(
-                modifier = Modifier.fillMaxHeight().padding(vertical = 4.dp),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(vertical = 4.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(

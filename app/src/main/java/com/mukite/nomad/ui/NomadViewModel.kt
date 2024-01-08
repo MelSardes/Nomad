@@ -2,6 +2,7 @@ package com.mukite.nomad.ui
 
 import androidx.lifecycle.ViewModel
 import com.mukite.nomad.data.NomadUiState
+import com.mukite.nomad.data.model.Booking
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -93,6 +94,12 @@ class NomadViewModel : ViewModel() {
     fun updateShowBottomBar(showBottomBar: Boolean) {
         _uiState.update { currentValue ->
             currentValue.copy(showBottomBar = showBottomBar)
+        }
+    }
+
+    fun selectedBookingHistoryItem(booking: Booking) {
+        _uiState.update { currentValue ->
+            currentValue.copy(selectedBookingHistoryItem = booking)
         }
     }
 

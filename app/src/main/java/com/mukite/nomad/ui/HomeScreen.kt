@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -61,56 +62,53 @@ fun HomeScreen(
             .verticalScroll(verticalScrollState)
             .fillMaxSize()
     ) {
-        HeaderImage(modifier = Modifier.fillMaxWidth())
+        VideoPlayer(modifier = Modifier.fillMaxWidth().height(200.dp))
         Spacer(modifier = Modifier.height(14.dp))
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+        HeaderSection(modifier = Modifier.padding(horizontal = 16.dp))
+
+        Spacer(modifier = Modifier.height(32.dp))
+        NewsSection(modifier = Modifier.fillMaxWidth())
+
+        Spacer(modifier = Modifier.height(32.dp))
+        WeatherSection(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
+
+        Spacer(modifier = Modifier.height(32.dp))
+        Button(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(16.dp),
+            shape = RoundedCornerShape(12.dp),
+            onClick = { navigateToDateSelection() }
         ) {
-
-            HeaderSection()
-
-            Spacer(modifier = Modifier.height(32.dp))
-            NewsSection(modifier = Modifier.fillMaxWidth())
-
-            Spacer(modifier = Modifier.height(32.dp))
-            WeatherSection(modifier = Modifier.fillMaxWidth())
-
-            Spacer(modifier = Modifier.height(32.dp))
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp),
-                shape = RoundedCornerShape(12.dp),
-                onClick = { navigateToDateSelection() }
-            ) {
-                Text(
-                    text = stringResource(R.string.booking_now),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            Divider(color = Color.Black.copy(alpha = 0.2f))
-
-            Spacer(modifier = Modifier.height(24.dp))
-            DescriptionSection()
-
-            Spacer(modifier = Modifier.height(24.dp))
-            GallerySection(modifier = Modifier.fillMaxWidth()) {
-                dialogImageViewerOpened.value = true
-                selectedImage = it
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            ServicesSection(modifier = Modifier.fillMaxWidth())
-
-            Spacer(modifier = Modifier.height(204.dp))
-            MapSection(modifier = Modifier.height(200.dp).fillMaxWidth())
+            Text(
+                text = stringResource(R.string.booking_now),
+                color = MaterialTheme.colorScheme.onPrimary,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+        Divider(color = Color.Black.copy(alpha = 0.2f))
+
+        Spacer(modifier = Modifier.height(24.dp))
+        DescriptionSection(modifier = Modifier.padding(horizontal = 16.dp))
+
+        Spacer(modifier = Modifier.height(24.dp))
+        GallerySection(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+            dialogImageViewerOpened.value = true
+            selectedImage = it
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+        ServicesSection(modifier = Modifier.fillMaxWidth())
+
+        Spacer(modifier = Modifier.height(24.dp))
+        MapSection(modifier = Modifier
+            .height(200.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+        )
     }
 }
 

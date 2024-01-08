@@ -378,7 +378,7 @@ fun ReservationSummary(uiState: NomadUiState, modifier: Modifier, onBackPressed:
 }
 
 @Composable
-private fun InfoSection(title: String, data: String, modifier: Modifier = Modifier) {
+fun InfoSection(title: String, data: String, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.padding(vertical = 16.dp),
         horizontalAlignment = Alignment.Start

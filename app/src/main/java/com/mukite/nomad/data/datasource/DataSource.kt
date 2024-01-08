@@ -25,7 +25,7 @@ object DataSource {
             checkIn = "30/05/2022",
             checkOut = "03/06/2022",
             reservationCode = "#F7t5R5",
-            roomType = "Standard",
+            roomType = "Suite",
         ),
         Booking(
             hotel = "Nomad",
@@ -36,7 +36,7 @@ object DataSource {
             checkIn = "10/10/2022",
             checkOut = "11/10/2022",
             reservationCode = "#F7t5R5",
-            roomType = "Standard",
+            roomType = "Appartement",
         ),
         Booking(
             hotel = "Nomad",
@@ -47,7 +47,7 @@ object DataSource {
             checkIn = "10/10/2022",
             checkOut = "11/10/2022",
             reservationCode = "#F7t5R5",
-            roomType = "Standard",
+            roomType = "Appartement",
         ),
         Booking(
             hotel = "Nomad",
@@ -58,7 +58,7 @@ object DataSource {
             checkIn = "10/10/2022",
             checkOut = "11/10/2022",
             reservationCode = "#F7d8P2",
-            roomType = "Standard",
+            roomType = "suite",
         ),
         Booking(
             hotel = "Nomad",
@@ -69,7 +69,7 @@ object DataSource {
             checkIn = "10/10/2022",
             checkOut = "11/10/2022",
             reservationCode = "#F7d8P2",
-            roomType = "Standard",
+            roomType = "Suite",
         ),
         Booking(
 
@@ -81,7 +81,7 @@ object DataSource {
             checkIn = "10/10/2022",
             checkOut = "11/10/2022",
             reservationCode = "#F7d8P2",
-            roomType = "Standard",
+            roomType = "Appartement",
         ),
         Booking(
             hotel = "Nomad",
@@ -92,7 +92,7 @@ object DataSource {
             checkIn = "10/10/2022",
             checkOut = "11/10/2022",
             reservationCode = "#F7d8P2",
-            roomType = "Standard",
+            roomType = "Suite",
         ),
     )
 

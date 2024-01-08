@@ -21,7 +21,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -39,7 +38,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -47,6 +45,8 @@ import androidx.navigation.compose.rememberNavController
 
 import com.mukite.nomad.R
 import com.mukite.nomad.SplashScreen
+import com.mukite.nomad.ui.bookingHistory.BookingHistory
+import com.mukite.nomad.ui.bookingHistory.BookingHistoryDetails
 import com.mukite.nomad.ui.booking_details.BookingDetails
 
 enum class NomadScreen(@StringRes val title: Int) {
@@ -58,6 +58,7 @@ enum class NomadScreen(@StringRes val title: Int) {
     UserProfile(title = R.string.profile),
     Bookings(title = R.string.reservations),
     SelectDate(title = R.string.select_date),
+    BookingHistoryItem(title = R.string.booking_history_item)
 }
 
 enum class BottomNavigationItem(
@@ -157,23 +158,6 @@ fun NomadApp(
 
 
     Scaffold(
-
-//                TODO : MAKE TOP BAR VISIBLE ONLY WHEN MAIN SCREEN
-
-
-/*
-        topBar = {
-                NomadAppBar(
-                    currentScreen = currentDestination,
-                    canNavigateBack = navController.previousBackStackEntry != null,
-                    navigateUp = { navController.navigateUp() }
-                )
-
-            //                    else null
-        },
-*/
-
-
         bottomBar = {
 
             if (shouldShowBottomBar.value) {
@@ -213,37 +197,6 @@ fun NomadApp(
         }
     }
 }
-
-/*@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun LeNomadAppBar(
-    currentScreen: NavDestination?,
-    canNavigateBack: Boolean,
-    navigateUp: () -> Boolean
-) {
-    TopAppBar(
-        title = { Text(
-            currentScreen?.route.orEmpty()
-        ) },
-        navigationIcon = {
-            if (canNavigateBack) {
-                IconButton(onClick = { navigateUp() }) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = null
-                    )
-                }
-            }
-        },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.primary,
-            navigationIconContentColor = MaterialTheme.colorScheme.primary,
-            actionIconContentColor = MaterialTheme.colorScheme.primary,
-            scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-        )
-    )
-}*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -287,7 +240,9 @@ private fun NomadNavContent(
 
         composable(route = BottomNavigationItem.Bookings.route) {
             Surface {
-                BookingHistory(modifier = Modifier.fillMaxSize())
+                BookingHistory(viewModel = viewModel, modifier = Modifier.fillMaxSize()) {
+                    navController.navigate(NomadScreen.BookingHistoryItem.name)
+                }
             }
         }
 
@@ -305,6 +260,10 @@ private fun NomadNavContent(
             BookingDetails(viewModel = viewModel, modifier = Modifier.fillMaxSize()) {
                 navController.navigateUp()
             }
+        }
+
+        composable(route = NomadScreen.BookingHistoryItem.name) {
+            BookingHistoryDetails(viewModel = viewModel, modifier = Modifier.fillMaxSize()) { navController.navigateUp() }
         }
     }
 }
