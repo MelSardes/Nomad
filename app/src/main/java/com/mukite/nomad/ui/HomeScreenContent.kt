@@ -214,7 +214,7 @@ fun MapSection(modifier: Modifier) {
 @Composable
 fun ServicesSection(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        HeaderSectionTitle(title = R.string.services)
+        HeaderSectionTitle(title = R.string.services, modifier = Modifier.padding(horizontal = 16.dp))
         Spacer(modifier = Modifier.height(8.dp))
 
         Row(
@@ -251,7 +251,7 @@ fun ServiceItem(modifier: Modifier = Modifier, service: Service) {
             horizontalAlignment = Alignment.Start,
         ) {
             Icon(
-                painter = painterResource(id = service.icon),
+                imageVector = service.icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -307,7 +307,7 @@ fun DescriptionSection(modifier: Modifier = Modifier) {
 @Composable
 fun GallerySection(modifier: Modifier = Modifier, onImageClick: (image: Int) -> Unit) {
     Column(horizontalAlignment = Alignment.Start, modifier = modifier) {
-        HeaderSectionTitle(title = R.string.photo_gallery, link = R.string.see_all)
+        HeaderSectionTitle(title = R.string.photo_gallery, link = R.string.see_all, modifier = Modifier.padding(horizontal = 16.dp))
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -315,7 +315,10 @@ fun GallerySection(modifier: Modifier = Modifier, onImageClick: (image: Int) -> 
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.height(112.dp)
         ) {
+
             items(galleryImages) { image ->
+                Spacer(modifier = Modifier.width(16.dp))
+
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -331,6 +334,9 @@ fun GallerySection(modifier: Modifier = Modifier, onImageClick: (image: Int) -> 
                         contentScale = ContentScale.Crop
                     )
                 }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
             }
         }
     }
@@ -376,9 +382,9 @@ fun DialogImageViewer(initialPage: Int, onClose: () -> Unit) {
 }
 
 @Composable
-fun HeaderSectionTitle(@StringRes title: Int, @StringRes link: Int? = null) {
+fun HeaderSectionTitle(@StringRes title: Int, modifier: Modifier = Modifier, @StringRes link: Int? = null) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(

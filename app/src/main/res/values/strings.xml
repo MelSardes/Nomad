@@ -53,4 +53,7 @@
     <string name="articleNews3_description">Le Nomad, Radio Gabon et SitiMobile ont rejoint le giron des partenaires de la Ligue nationale de football professionnel (Linafp), conformément aux conventions signées le 19 février à Libreville.</string>
     <string name="splash">Splash Screen</string>
     <string name="booking_history_item">Booking History Item</string>
+    <string name="massage">Massage</string>
+    <string name="atm">ATM</string>
+    <string name="clothesService">Service de linge</string>
 </resources>

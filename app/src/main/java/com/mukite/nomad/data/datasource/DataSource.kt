@@ -13,6 +13,9 @@ object DataSource {
         Service.UnlimitedInternet,
         Service.Fitness,
         Service.RoomService,
+        Service.Massage,
+        Service.ATM,
+        Service.ClothesService,
     )
 
     val bookingSampleList = listOf(

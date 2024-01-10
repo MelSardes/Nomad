@@ -95,7 +95,7 @@ fun HomeScreen(
         DescriptionSection(modifier = Modifier.padding(horizontal = 16.dp))
 
         Spacer(modifier = Modifier.height(24.dp))
-        GallerySection(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+        GallerySection(modifier = Modifier.fillMaxWidth()) {
             dialogImageViewerOpened.value = true
             selectedImage = it
         }
