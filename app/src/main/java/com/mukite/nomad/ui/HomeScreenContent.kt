@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,6 +33,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -81,7 +83,9 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.mukite.nomad.R
 import com.mukite.nomad.data.datasource.DataSource
+import com.mukite.nomad.data.datasource.DataSource.galleryImages
 import com.mukite.nomad.data.datasource.DataSource.newsList
+import com.mukite.nomad.data.datasource.DataSource.weatherIconsList
 import com.mukite.nomad.data.model.News
 import com.mukite.nomad.data.model.Service
 import com.mukite.nomad.utils.MapScreen
@@ -129,7 +133,8 @@ fun HeaderSection(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
         )
 
         Row(
@@ -145,8 +150,9 @@ fun HeaderSection(modifier: Modifier = Modifier) {
             )
 
             Text(
-                text = "Quartier de l'aéroport, B.P. 8580, Libreville - Gabon",
-                style = MaterialTheme.typography.labelSmall
+                text = stringResource(R.string.hotel_location),
+                style = MaterialTheme.typography.labelSmall,
+                textAlign = TextAlign.Center
             )
         }
     }
@@ -286,7 +292,7 @@ fun DescriptionSection(modifier: Modifier = Modifier) {
                     else R.string.nomad_hotel_description_expanded
                 ))
 
-                if(isContentHidden) {
+
                     withStyle(
                         style = SpanStyle(
                             textDecoration = TextDecoration.Underline,
@@ -294,12 +300,15 @@ fun DescriptionSection(modifier: Modifier = Modifier) {
                             fontWeight = FontWeight.Bold,
                         )
                     ) {
-                        append(stringResource(id = R.string.see_more))
+                        append(stringResource(
+                            id = if(isContentHidden) R.string.see_more else R.string.see_less
+                        ))
                     }
-                }
+
             },
             color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Justify
         )
     }
 }
@@ -307,22 +316,28 @@ fun DescriptionSection(modifier: Modifier = Modifier) {
 @Composable
 fun GallerySection(modifier: Modifier = Modifier, onImageClick: (image: Int) -> Unit) {
     Column(horizontalAlignment = Alignment.Start, modifier = modifier) {
-        HeaderSectionTitle(title = R.string.photo_gallery, link = R.string.see_all, modifier = Modifier.padding(horizontal = 16.dp))
+        HeaderSectionTitle(
+            title = R.string.photo_gallery,
+            link = R.string.see_all,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.height(112.dp)
         ) {
 
-            items(galleryImages) { image ->
+            item {
                 Spacer(modifier = Modifier.width(16.dp))
-
+            }
+            items(galleryImages) { image ->
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
                         .width(132.dp)
+                        .offset(x = ((-20)*galleryImages.indexOf(image)).dp)
+                        .shadow(6.dp, RoundedCornerShape(12.dp), spotColor = Color.Black)
                         .clip(RoundedCornerShape(12.dp))
                         .clickable { onImageClick(galleryImages.indexOf(image)) },
                     contentAlignment = Alignment.Center
@@ -334,9 +349,6 @@ fun GallerySection(modifier: Modifier = Modifier, onImageClick: (image: Int) -> 
                         contentScale = ContentScale.Crop
                     )
                 }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
             }
         }
     }
@@ -407,16 +419,11 @@ fun HeaderSectionTitle(@StringRes title: Int, modifier: Modifier = Modifier, @St
 }
 
 @Composable
-fun NewsSectionPreview() {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        NewsSection(modifier = Modifier.fillMaxWidth())
-    }
-}
-
-@Composable
 fun NewsSection(modifier: Modifier = Modifier) {
-
-    Row(modifier = modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    Row(
+        modifier = modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         Spacer(modifier = Modifier.width(4.dp))
         newsList.forEach {
             NewsItem(news = it, modifier = Modifier.width(280.dp))
@@ -428,7 +435,13 @@ fun NewsSection(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsItem(news: News, modifier: Modifier = Modifier) {
-    Card(modifier = modifier.height(90.dp), elevation = CardDefaults.cardElevation(2.dp), shape = RoundedCornerShape(8.dp), onClick = {}) {
+    Card(
+        modifier = modifier.height(100.dp),
+        elevation = CardDefaults.cardElevation(2.dp),
+        shape = RoundedCornerShape(8.dp),
+        onClick = {},
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
         Row {
             Box(modifier = Modifier
                 .fillMaxHeight()
@@ -442,16 +455,16 @@ fun NewsItem(news: News, modifier: Modifier = Modifier) {
                         .clip(RoundedCornerShape(8.dp, 0.dp, 0.dp, 8.dp))
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
+//            Spacer(modifier = Modifier.width(8.dp))
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .padding(vertical = 4.dp),
+                    .padding(8.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = stringResource(id = news.title).lowercase().replaceFirstChar { it.uppercase() },
-                    color = MaterialTheme.colorScheme.secondary,
+//                    color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodyMedium ,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 3,
@@ -467,14 +480,6 @@ fun NewsItem(news: News, modifier: Modifier = Modifier) {
                 )
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun NewsItemPreview() {
-    Surface {
-        NewsItem(news = newsList[0])
     }
 }
 
@@ -508,26 +513,17 @@ fun DayItem(day: LocalDate, modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.labelLarge,
         )
         Spacer(modifier = Modifier.height(12.dp))
-        Image(painter = painterResource(id = R.drawable.sun), contentDescription = null, modifier = Modifier.size(32.dp))
+        Image(
+            painter = painterResource(id = weatherIconsList.random()),
+            contentDescription = null,
+            modifier = Modifier.size(32.dp)
+        )
         Text(
-            text = "28°",
+            text = "${(18..38).random()}°",
             color = MaterialTheme.colorScheme.secondary,
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.SemiBold
         )
-
     }
 }
 
-
-val galleryImages = listOf(
-    R.drawable.gallerie1,
-    R.drawable.gallerie2,
-    R.drawable.gallerie3,
-    R.drawable.gallerie4,
-    R.drawable.gallerie5,
-    R.drawable.gallerie6,
-    R.drawable.gallerie7,
-    R.drawable.gallerie8,
-    R.drawable.gallerie9,
-)

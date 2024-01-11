@@ -119,5 +119,31 @@ object DataSource {
             date = R.string.articleNews3_date,
         )
     )
+
+
+    val galleryImages = listOf(
+        R.drawable.gallerie1,
+        R.drawable.gallerie2,
+        R.drawable.gallerie3,
+        R.drawable.gallerie4,
+        R.drawable.gallerie5,
+        R.drawable.gallerie6,
+        R.drawable.gallerie7,
+        R.drawable.gallerie8,
+        R.drawable.gallerie9,
+    )
+
+
+    val weatherIconsList = listOf(
+        R.drawable.rain,
+        R.drawable.rain2,
+        R.drawable.rain3,
+        R.drawable.sun,
+        R.drawable.sun_cloud,
+        R.drawable.sun_rain,
+        R.drawable.sun_rain2,
+        R.drawable.thunderstorm,
+        R.drawable.thunderstorm_rain,
+    )
 }
 

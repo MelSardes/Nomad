@@ -2,6 +2,8 @@
 
 package com.mukite.nomad.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -147,6 +149,7 @@ fun NomadAppBar(
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun NomadApp(
 ) {
@@ -198,6 +201,7 @@ fun NomadApp(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NomadNavContent(
@@ -229,8 +233,10 @@ private fun NomadNavContent(
 
         composable(route = BottomNavigationItem.Home.route) {
 //                Text(text = "Home")
-            HomeScreen(modifier = Modifier.fillMaxSize()) {
-                navController.navigate(NomadScreen.BookingDetails.name)
+            Surface {
+                HomeScreen(modifier = Modifier.fillMaxSize()) {
+                    navController.navigate(NomadScreen.BookingDetails.name)
+                }
             }
         }
 

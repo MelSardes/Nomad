@@ -11,7 +11,7 @@
     <string name="see_all">Tout voir</string>
     <string name="details">Détails</string>
     <string name="nomad_hotel_description_short">LA SOLUTION POUR VOS VOYAGES D’AFFAIRES AU GABON\nUn hôtel d’exception, à la fois proche et délicieusement à l’abri du temps. Un lieu qui cultive en toute discrétion l’excellence, l’authenticité et la simplicité ... </string>
-    <string name="nomad_hotel_description_expanded">LA SOLUTION POUR VOS VOYAGES D’AFFAIRES AU GABON\nUn hôtel d’exception, à la fois proche et délicieusement à l’abri du temps. Un lieu qui cultive en toute discrétion l’excellence, l’authenticité et la simplicité.\n\nEn franchissant les portes du NOMAD, un havre de paix s’invite pour les séjours professionnels comme pour les séjours détentes.\nL’hôtel NOMAD vous offre un service personnalisé et une prestation haut de gamme.\n\nTous les jours, toute l\'année, pour chaque séjour.\n\nBienvenue au NOMAD</string>
+    <string name="nomad_hotel_description_expanded">LA SOLUTION POUR VOS VOYAGES D’AFFAIRES AU GABON\nUn hôtel d’exception, à la fois proche et délicieusement à l’abri du temps. Un lieu qui cultive en toute discrétion l’excellence, l’authenticité et la simplicité.\n\nEn franchissant les portes du NOMAD, un havre de paix s’invite pour les séjours professionnels comme pour les séjours détentes.\nL’hôtel NOMAD vous offre un service personnalisé et une prestation haut de gamme.\n\nTous les jours, toute l\'année, pour chaque séjour.\n\nBienvenue au NOMAD ... </string>
     <string name="see_more">Voir plus</string>
     <string name="description">Description</string>
     <string name="airportWelcome">Accueil aéroport</string>
@@ -56,4 +56,6 @@
     <string name="massage">Massage</string>
     <string name="atm">ATM</string>
     <string name="clothesService">Service de linge</string>
+    <string name="hotel_location">Quartier de l\'aéroport, B.P. 8580, Libreville - Gabon</string>
+    <string name="see_less">Voir moins</string>
 </resources>

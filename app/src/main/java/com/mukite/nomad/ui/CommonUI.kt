@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.lerp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mukite.nomad.data.datasource.DataSource.galleryImages
 import kotlin.math.absoluteValue
 
 @Composable

@@ -18,11 +18,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
@@ -132,9 +136,9 @@ private fun BookingList(selectedChip: Int, scrollState: ScrollState, onCardClick
 }
 
 val chipsTags = listOf(
-    "En cours",
-    "Complet",
-    "Annulé"
+    Pair("En cours",Icons.Filled.Timelapse),
+    Pair("Complet", Icons.Filled.Check),
+    Pair("Annulé", Icons.Filled.Cancel),
 )
 
 @Composable
@@ -146,15 +150,26 @@ private fun ChipsOptions(
 ) {
 
     Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        chipsTags.forEachIndexed { index, chipTag ->
-            InputChip(
+        chipsTags.forEachIndexed { index, (chipTag, icon) ->
+            FilterChip(
                 selected = selectedChip == index,
                 onClick = { onChipSelected(index) },
+                leadingIcon = { Icon(imageVector = icon, contentDescription = null) },
                 label = { Text(chipTag) },
                 colors = InputChipDefaults.inputChipColors(
                     containerColor = MaterialTheme.colorScheme.surface,
-                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedContainerColor = when (index) {
+                        0 -> MaterialTheme.colorScheme.secondaryContainer
+                        1 -> MaterialTheme.colorScheme.inverseSurface
+                        2 -> MaterialTheme.colorScheme.errorContainer
+                        else -> MaterialTheme.colorScheme.primary
+                    },
+                    selectedLabelColor = when (index) {
+                        0 -> MaterialTheme.colorScheme.onSecondaryContainer
+                        1 -> MaterialTheme.colorScheme.inverseOnSurface
+                        2 -> MaterialTheme.colorScheme.onErrorContainer
+                        else -> MaterialTheme.colorScheme.primary
+                    },
                 )
             )
         }

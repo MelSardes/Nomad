@@ -1,7 +1,12 @@
 package com.mukite.nomad.ui
 
+import android.os.Build
+import android.os.VibrationEffect
+import android.system.Os
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -32,6 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import com.mukite.nomad.R
 
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -49,6 +58,7 @@ fun HomeScreen(
     var selectedImage by remember {
         mutableIntStateOf(0)
     }
+    val haptic = LocalHapticFeedback.current
 
     AnimatedVisibility(visible = dialogImageViewerOpened.value) {
         DialogImageViewer(selectedImage) {
@@ -62,53 +72,72 @@ fun HomeScreen(
             .verticalScroll(verticalScrollState)
             .fillMaxSize()
     ) {
-        VideoPlayer(modifier = Modifier.fillMaxWidth().height(200.dp))
-        Spacer(modifier = Modifier.height(14.dp))
+        VideoPlayer(modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp))
+//        Spacer(modifier = Modifier.height(14.dp))
 
-        HeaderSection(modifier = Modifier.padding(horizontal = 16.dp))
-
-        Spacer(modifier = Modifier.height(32.dp))
-        NewsSection(modifier = Modifier.fillMaxWidth())
-
-        Spacer(modifier = Modifier.height(32.dp))
-        WeatherSection(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
-
-        Spacer(modifier = Modifier.height(32.dp))
-        Button(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-            contentPadding = PaddingValues(16.dp),
-            shape = RoundedCornerShape(12.dp),
-            onClick = { navigateToDateSelection() }
+        Column(
+            modifier = Modifier
+                .offset(y = (-12).dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            Text(
-                text = stringResource(R.string.booking_now),
-                color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
+            HeaderSection(modifier = Modifier.padding(horizontal = 16.dp))
+
+            Spacer(modifier = Modifier.height(32.dp))
+            NewsSection(modifier = Modifier.fillMaxWidth())
+
+            Spacer(modifier = Modifier.height(32.dp))
+            WeatherSection(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                contentPadding = PaddingValues(16.dp),
+                shape = RoundedCornerShape(12.dp),
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    navigateToDateSelection()
+                }
+            ) {
+                Text(
+                    text = stringResource(R.string.booking_now),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Divider(color = Color.Black.copy(alpha = 0.2f))
+
+            Spacer(modifier = Modifier.height(24.dp))
+            DescriptionSection(modifier = Modifier.padding(horizontal = 16.dp))
+
+            Spacer(modifier = Modifier.height(24.dp))
+            GallerySection(modifier = Modifier.fillMaxWidth()) {
+                dialogImageViewerOpened.value = true
+                selectedImage = it
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            ServicesSection(modifier = Modifier.fillMaxWidth())
+
+            Spacer(modifier = Modifier.height(24.dp))
+            MapSection(
+                modifier = Modifier
+                    .height(200.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
             )
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-        Divider(color = Color.Black.copy(alpha = 0.2f))
-
-        Spacer(modifier = Modifier.height(24.dp))
-        DescriptionSection(modifier = Modifier.padding(horizontal = 16.dp))
-
-        Spacer(modifier = Modifier.height(24.dp))
-        GallerySection(modifier = Modifier.fillMaxWidth()) {
-            dialogImageViewerOpened.value = true
-            selectedImage = it
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-        ServicesSection(modifier = Modifier.fillMaxWidth())
-
-        Spacer(modifier = Modifier.height(24.dp))
-        MapSection(modifier = Modifier
-            .height(200.dp)
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-        )
     }
 }
 
@@ -133,6 +162,7 @@ fun TabItem(icon: ImageVector, index: Int, selectedIndex: Int, modifier: Modifie
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Preview(showBackground = true, showSystemUi = true, device = "id:small_phone")
 @Composable
 fun HomeScreenPreview() {
