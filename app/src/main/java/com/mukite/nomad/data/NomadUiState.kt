@@ -1,6 +1,7 @@
 package com.mukite.nomad.data
 
 import com.mukite.nomad.data.model.Booking
+import com.mukite.nomad.data.model.News
 import com.mukite.nomad.ui.RoomType
 import java.time.Duration
 import java.time.Instant
@@ -19,6 +20,9 @@ data class NomadUiState(
     val selectedRoomType: RoomType = RoomType.SUITE,
     val selectedBookingHistoryItem: Booking? = null,
     val searchQuery: String = "",
+
+    val currentPageName: String = "",
+    val selectedArticle: News? = null
 )
 
 data class PersonalInformation(

@@ -4,7 +4,7 @@
     <string name="reservation_details">Détails de la réservation</string>
     <string name="payment">Payement</string>
     <string name="profile">Profil</string>
-    <string name="reservations">Réservations</string>
+    <string name="reservations">Historique</string>
     <string name="select_date">Sélectionner une date</string>
     <string name="home">Accueil</string>
     <string name="photo_gallery">Galerie photos</string>
@@ -59,4 +59,7 @@
     <string name="hotel_location">Quartier de l\'aéroport, B.P. 8580, Libreville - Gabon</string>
     <string name="see_less">Voir moins</string>
     <string name="search_placeholder">Rechercher une réservation ...</string>
+    <string name="empty_state">Empty State</string>
+    <string name="article_details">Article details</string>
+    <string name="settings">Parametres</string>
 </resources>

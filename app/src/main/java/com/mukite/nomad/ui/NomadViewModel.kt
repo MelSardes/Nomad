@@ -3,6 +3,7 @@ package com.mukite.nomad.ui
 import androidx.lifecycle.ViewModel
 import com.mukite.nomad.data.NomadUiState
 import com.mukite.nomad.data.model.Booking
+import com.mukite.nomad.data.model.News
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -106,6 +107,18 @@ class NomadViewModel : ViewModel() {
     fun onSearchQueryChange(query: String) {
         _uiState.update { currentValue ->
             currentValue.copy(searchQuery = query)
+        }
+    }
+
+    fun updateCurrentPageName(name: String) {
+        _uiState.update { currentValue ->
+            currentValue.copy(currentPageName = name)
+        }
+    }
+
+    fun updateSelectedArticle(article: News) {
+        _uiState.update { currentValue ->
+            currentValue.copy(selectedArticle = article)
         }
     }
 

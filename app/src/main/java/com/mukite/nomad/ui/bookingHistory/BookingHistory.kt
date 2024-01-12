@@ -65,6 +65,8 @@ import com.mukite.nomad.data.datasource.DataSource
 import com.mukite.nomad.data.model.Booking
 import com.mukite.nomad.data.model.BookingStatus
 import com.mukite.nomad.ui.NomadViewModel
+import com.mukite.nomad.utils.calculateDaysDifference
+import java.text.SimpleDateFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -264,6 +266,10 @@ private fun ChipsOptions(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookingCard(booking: Booking, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    val daysDifference = calculateDaysDifference(
+        SimpleDateFormat("dd/MM/yyyy").parse(booking?.checkIn).time,
+        SimpleDateFormat("dd/MM/yyyy").parse(booking?.checkOut).time
+    )
 
     Card(
         onClick = { onClick() },
@@ -298,20 +304,42 @@ fun BookingCard(booking: Booking, modifier: Modifier = Modifier, onClick: () -> 
                     .fillMaxSize()
                     .padding(vertical = 4.dp)
             ) {
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        text = "Date de réservation",
-                        textAlign = TextAlign.Start,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.tertiary
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            text = "Date de réservation",
+                            textAlign = TextAlign.Start,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
                         )
-                    )
-                    Text(
-                        text = booking.checkIn,
-                        textAlign = TextAlign.Start,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                        Text(
+                            text = booking.checkIn,
+                            textAlign = TextAlign.Start,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            text = "Durée",
+                            textAlign = TextAlign.Start,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
+                        )
+                        Text(
+                            text = daysDifference.toString() + " nuit(s)",
+                            textAlign = TextAlign.Start,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -356,7 +384,7 @@ fun BookingCard(booking: Booking, modifier: Modifier = Modifier, onClick: () -> 
 
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "${booking.price} Fcfa",
+                    text = "${daysDifference * booking?.price!!} Fcfa",
                     color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 )

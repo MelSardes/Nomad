@@ -45,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mukite.nomad.R
+import com.mukite.nomad.data.model.News
 
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -52,6 +53,8 @@ import com.mukite.nomad.R
 fun HomeScreen(
     modifier: Modifier = Modifier,
     navigateToDateSelection: () -> Unit,
+    onWeatherClick: () -> Unit,
+    navigateToArticle: (news: News) -> Unit
 ) {
     val verticalScrollState = rememberScrollState()
     val dialogImageViewerOpened = remember { mutableStateOf(false) }
@@ -89,7 +92,7 @@ fun HomeScreen(
             Divider(color = Color.Black.copy(alpha = 0.1f), modifier = Modifier, thickness = 8.dp)
             Spacer(modifier = Modifier.height(24.dp))
 
-            NewsSection(modifier = Modifier.fillMaxWidth())
+            NewsSection(modifier = Modifier.fillMaxWidth()) { navigateToArticle(it) }
 
             Spacer(modifier = Modifier.height(24.dp))
             Divider(color = Color.Black.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
@@ -99,7 +102,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-            )
+            ) { onWeatherClick() }
 
             Spacer(modifier = Modifier.height(32.dp))
             Button(
@@ -180,5 +183,5 @@ fun TabItem(icon: ImageVector, index: Int, selectedIndex: Int, modifier: Modifie
 @Preview(showBackground = true, showSystemUi = true, device = "id:small_phone")
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen {}
+    HomeScreen(modifier = Modifier, {}, {}) {}
 }

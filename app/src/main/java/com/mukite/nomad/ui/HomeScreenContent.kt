@@ -423,14 +423,14 @@ fun HeaderSectionTitle(@StringRes title: Int, modifier: Modifier = Modifier, @St
 }
 
 @Composable
-fun NewsSection(modifier: Modifier = Modifier) {
+fun NewsSection(modifier: Modifier = Modifier, navigateToArticle: (news: News) -> Unit) {
     Row(
         modifier = modifier.horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Spacer(modifier = Modifier.width(4.dp))
         newsList.forEach {
-            NewsItem(news = it, modifier = Modifier)
+            NewsItem(news = it, modifier = Modifier) { navigateToArticle(it) }
         }
         Spacer(modifier = Modifier.width(4.dp))
     }
@@ -438,11 +438,11 @@ fun NewsSection(modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewsItem(news: News, modifier: Modifier = Modifier) {
+fun NewsItem(news: News, modifier: Modifier = Modifier, onClick: () -> Unit) {
     ElevatedCard(
         modifier = modifier.size(280.dp, 100.dp),
         elevation = CardDefaults.cardElevation(2.dp),
-        onClick = {},
+        onClick = { onClick() },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(green = 0.97f))
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -485,9 +485,9 @@ fun NewsItem(news: News, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun WeatherSection(modifier: Modifier = Modifier) {
+fun WeatherSection(modifier: Modifier = Modifier, onClick: () -> Unit) {
     val fourNextDays = generateNext4Days()
-    Surface(modifier = modifier, tonalElevation = 4.dp, shape = RoundedCornerShape(16.dp)) {
+    Surface(modifier = modifier.clickable { onClick() }, tonalElevation = 4.dp, shape = RoundedCornerShape(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)

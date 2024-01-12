@@ -1,5 +1,8 @@
 package com.mukite.nomad.data.model
 
+import java.time.LocalDate
+import java.time.ZoneOffset
+
 data class Booking(
     val id: Int,
     val hotel: String,
@@ -16,6 +19,15 @@ data class Booking(
     companion object {
         val ROOM_PRICE = 181_000
     }
+        fun checkInToLongDate(): Long = LocalDate.parse(checkIn).atStartOfDay().toInstant(
+            ZoneOffset.UTC).toEpochMilli()
+
+        fun checkOutToLongDate(): Long = LocalDate.parse(checkOut).atStartOfDay().toInstant(
+            ZoneOffset.UTC).toEpochMilli()
+
+        fun dateToLongDate(): Long = LocalDate.parse(date).atStartOfDay().toInstant(
+            ZoneOffset.UTC).toEpochMilli()
+
 }
 
 enum class BookingStatus {

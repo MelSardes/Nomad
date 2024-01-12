@@ -13,7 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.List
-import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -57,10 +57,13 @@ enum class NomadScreen(@StringRes val title: Int) {
     HotelDetails(title = R.string.hotel),
     BookingDetails(title = R.string.reservation_details),
     Payment(title = R.string.payment),
+    Settings(title = R.string.settings),
     UserProfile(title = R.string.profile),
     Bookings(title = R.string.reservations),
     SelectDate(title = R.string.select_date),
-    BookingHistoryItem(title = R.string.booking_history_item)
+    BookingHistoryItem(title = R.string.booking_history_item),
+    EmptyState(title = R.string.empty_state),
+    ArticleDetails(title = R.string.article_details)
 }
 
 enum class BottomNavigationItem(
@@ -80,17 +83,17 @@ enum class BottomNavigationItem(
         Icons.Rounded.List
     ),
 
-    UserProfile(
-        NomadScreen.UserProfile.name,
-        R.string.profile,
-        Icons.Rounded.Person
+    Settings(
+        NomadScreen.Settings.name,
+        R.string.settings,
+        Icons.Rounded.Settings
     )
 }
 
 val bottomNavigationItems = listOf(
     BottomNavigationItem.Home,
     BottomNavigationItem.Bookings,
-    BottomNavigationItem.UserProfile
+    BottomNavigationItem.Settings
 )
 
 @Composable
@@ -151,8 +154,7 @@ fun NomadAppBar(
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
-fun NomadApp(
-) {
+fun NomadApp() {
     val navController: NavHostController = rememberNavController()
     val shouldShowBottomBar = remember { mutableStateOf(false) }
 
@@ -234,14 +236,26 @@ private fun NomadNavContent(
         composable(route = BottomNavigationItem.Home.route) {
 //                Text(text = "Home")
             Surface {
-                HomeScreen(modifier = Modifier.fillMaxSize()) {
-                    navController.navigate(NomadScreen.BookingDetails.name)
-                }
+                HomeScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    navigateToDateSelection = { navController.navigate(NomadScreen.BookingDetails.name) },
+                    onWeatherClick = {
+                        viewModel.updateCurrentPageName("Infos Météo")
+                        navController.navigate(NomadScreen.EmptyState.name)
+                    },
+                    navigateToArticle =  {
+                        viewModel.updateSelectedArticle(it)
+                        navController.navigate(NomadScreen.ArticleDetails.name)
+                    }
+                )
             }
         }
 
-        composable(route = BottomNavigationItem.UserProfile.route) {
-            UserProfile(appBarScrollState, listScrollState, Modifier.fillMaxSize())
+        composable(route = BottomNavigationItem.Settings.route) {
+            Settings(appBarScrollState, listScrollState, Modifier.fillMaxSize()) {
+                viewModel.updateCurrentPageName(it)
+                navController.navigate(NomadScreen.EmptyState.name)
+                }
         }
 
         composable(route = BottomNavigationItem.Bookings.route) {
@@ -270,6 +284,14 @@ private fun NomadNavContent(
 
         composable(route = NomadScreen.BookingHistoryItem.name) {
             BookingHistoryDetails(viewModel = viewModel, modifier = Modifier.fillMaxSize()) { navController.navigateUp() }
+        }
+
+        composable(route = NomadScreen.EmptyState.name) {
+            EmptyState(viewModel) { navController.navigateUp() }
+        }
+
+        composable(route = NomadScreen.ArticleDetails.name) {
+            Article(viewModel) { navController.navigateUp() }
         }
     }
 }

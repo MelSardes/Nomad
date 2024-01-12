@@ -116,6 +116,13 @@ fun BookingHistoryDetails(viewModel: NomadViewModel, modifier: Modifier, onBackP
                 "Détails",
                 "$daysDifference nuit(s), 1 ${booking?.roomType}",
             )
+
+            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+
+            InfoSection(
+                "Total",
+                "${daysDifference * booking?.price!!}  Franc CFA",
+            )
         }
 
         Spacer(modifier = Modifier.height(40.dp))
