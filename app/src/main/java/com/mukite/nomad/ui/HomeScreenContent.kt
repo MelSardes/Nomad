@@ -443,7 +443,7 @@ fun NewsItem(news: News, modifier: Modifier = Modifier) {
         modifier = modifier.size(280.dp, 100.dp),
         elevation = CardDefaults.cardElevation(2.dp),
         onClick = {},
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(green = 0.98f))
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(green = 0.97f))
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier
