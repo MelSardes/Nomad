@@ -1,4 +1,4 @@
-# 🇫🇷 Libreville Nomad Hotel Android App
+# 🇬🇧 Libreville Nomad Hotel Android App
 
 ![Platform](https://img.shields.io/badge/platform-Android-brightgreen)
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-1.0.0-blue)
@@ -38,7 +38,7 @@ Thank you for choosing the Libreville Nomad Hotel Android app! 🏨📱
 ---
 
 
-# 🇬🇧 Application Android de l'Hôtel Nomade Libreville
+# 🇫🇷 Application Android de l'Hôtel Nomade Libreville
 
 ![Platform](https://img.shields.io/badge/platform-Android-brightgreen)
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-1.0.0-blue)
