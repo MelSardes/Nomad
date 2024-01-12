@@ -68,7 +68,7 @@ fun BookingHistory(
         TopBar()
         ChipsOptions(
             selectedChip = selectedChip,
-            modifier = Modifier.width(IntrinsicSize.Max)
+            modifier = Modifier.fillMaxWidth()
         ) { selectedChip = it }
 
         Spacer(modifier = Modifier.padding(16.dp))
@@ -149,7 +149,13 @@ private fun ChipsOptions(
     onChipSelected: (Int) -> Unit
 ) {
 
-    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(
+            alignment = Alignment.CenterHorizontally,
+            space = 8.dp
+        )
+    ) {
         chipsTags.forEachIndexed { index, (chipTag, icon) ->
             FilterChip(
                 selected = selectedChip == index,
@@ -159,14 +165,14 @@ private fun ChipsOptions(
                 colors = InputChipDefaults.inputChipColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     selectedContainerColor = when (index) {
-                        0 -> MaterialTheme.colorScheme.secondaryContainer
-                        1 -> MaterialTheme.colorScheme.inverseSurface
+                        0 -> Color(0xFFA9D6E5)
+                        1 -> Color(0xFFB7E4C7)
                         2 -> MaterialTheme.colorScheme.errorContainer
                         else -> MaterialTheme.colorScheme.primary
                     },
                     selectedLabelColor = when (index) {
-                        0 -> MaterialTheme.colorScheme.onSecondaryContainer
-                        1 -> MaterialTheme.colorScheme.inverseOnSurface
+                        0 -> Color(0xFF013A63)
+                        1 -> Color(0xFF1B4332)
                         2 -> MaterialTheme.colorScheme.onErrorContainer
                         else -> MaterialTheme.colorScheme.primary
                     },
