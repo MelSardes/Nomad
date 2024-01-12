@@ -83,12 +83,18 @@ fun HomeScreen(
                 .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            HeaderSection(modifier = Modifier.padding(horizontal = 16.dp))
+            HeaderSection(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp))
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+            Divider(color = Color.Black.copy(alpha = 0.1f), modifier = Modifier, thickness = 8.dp)
+            Spacer(modifier = Modifier.height(24.dp))
+
             NewsSection(modifier = Modifier.fillMaxWidth())
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+            Divider(color = Color.Black.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+
             WeatherSection(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -116,21 +122,29 @@ fun HomeScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            Divider(color = Color.Black.copy(alpha = 0.2f))
-
+            Divider(color = Color.Black.copy(alpha = 0.1f), modifier = Modifier, thickness = 8.dp)
             Spacer(modifier = Modifier.height(24.dp))
             DescriptionSection(modifier = Modifier.padding(horizontal = 16.dp))
 
             Spacer(modifier = Modifier.height(24.dp))
+            Divider(color = Color.Black.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+
             GallerySection(modifier = Modifier.fillMaxWidth()) {
                 dialogImageViewerOpened.value = true
                 selectedImage = it
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+            Divider(color = Color.Black.copy(alpha = 0.1f), modifier = Modifier.padding(horizontal = 16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+
             ServicesSection(modifier = Modifier.fillMaxWidth())
 
             Spacer(modifier = Modifier.height(24.dp))
+            Divider(color = Color.Black.copy(alpha = 0.1f), modifier = Modifier, thickness = 8.dp)
+            Spacer(modifier = Modifier.height(24.dp))
+
             MapSection(
                 modifier = Modifier
                     .height(200.dp)
