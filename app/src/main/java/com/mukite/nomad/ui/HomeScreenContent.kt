@@ -35,6 +35,7 @@ import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -138,8 +139,9 @@ fun HeaderSection(modifier: Modifier = Modifier) {
         )
 
         Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.Bottom
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Bottom,
+            modifier = Modifier.fillMaxWidth()
         ) {
             Image(
                 imageVector = Icons.Rounded.LocationOn,
@@ -152,7 +154,8 @@ fun HeaderSection(modifier: Modifier = Modifier) {
             Text(
                 text = stringResource(R.string.hotel_location),
                 style = MaterialTheme.typography.labelSmall,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Start,
+                modifier = Modifier
             )
         }
     }
@@ -254,7 +257,7 @@ fun ServiceItem(modifier: Modifier = Modifier, service: Service) {
                 .fillMaxSize()
                 .padding(8.dp),
             verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.Start,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Icon(
                 imageVector = service.icon,
@@ -267,7 +270,8 @@ fun ServiceItem(modifier: Modifier = Modifier, service: Service) {
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 2,
                 softWrap = true,
-                modifier = Modifier
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
         }
     }
@@ -426,7 +430,7 @@ fun NewsSection(modifier: Modifier = Modifier) {
     ) {
         Spacer(modifier = Modifier.width(4.dp))
         newsList.forEach {
-            NewsItem(news = it, modifier = Modifier.width(280.dp))
+            NewsItem(news = it, modifier = Modifier)
         }
         Spacer(modifier = Modifier.width(4.dp))
     }
@@ -435,14 +439,13 @@ fun NewsSection(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsItem(news: News, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier.height(100.dp),
+    ElevatedCard(
+        modifier = modifier.size(280.dp, 100.dp),
         elevation = CardDefaults.cardElevation(2.dp),
-        shape = RoundedCornerShape(8.dp),
         onClick = {},
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(green = 0.98f))
     ) {
-        Row {
+        Row(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier
                 .fillMaxHeight()
                 .width(100.dp)) {
@@ -450,9 +453,7 @@ fun NewsItem(news: News, modifier: Modifier = Modifier) {
                     painter = painterResource(id = news.image),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(8.dp, 0.dp, 0.dp, 8.dp))
+                    modifier = Modifier.fillMaxSize()
                 )
             }
 //            Spacer(modifier = Modifier.width(8.dp))
