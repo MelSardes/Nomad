@@ -20,6 +20,7 @@ object DataSource {
 
     val bookingSampleList = listOf(
         Booking(
+            id = 1,
             hotel = "Nomad",
             place = "Libreville",
             status = BookingStatus.ONGOING,
@@ -31,6 +32,7 @@ object DataSource {
             roomType = "Suite",
         ),
         Booking(
+            id = 2,
             hotel = "Nomad",
             place = "Libreville",
             status = BookingStatus.COMPLETED,
@@ -42,6 +44,7 @@ object DataSource {
             roomType = "Appartement",
         ),
         Booking(
+            id = 3,
             hotel = "Nomad",
             place = "Libreville",
             status = BookingStatus.CANCELED,
@@ -53,6 +56,7 @@ object DataSource {
             roomType = "Appartement",
         ),
         Booking(
+            id = 4,
             hotel = "Nomad",
             place = "Libreville",
             status = BookingStatus.ONGOING,
@@ -64,6 +68,7 @@ object DataSource {
             roomType = "suite",
         ),
         Booking(
+            id = 5,
             hotel = "Nomad",
             place = "Libreville",
             status = BookingStatus.COMPLETED,
@@ -75,7 +80,7 @@ object DataSource {
             roomType = "Suite",
         ),
         Booking(
-
+            id = 6,
             hotel = "Nomad",
             place = "Libreville",
             status = BookingStatus.ONGOING,
@@ -87,6 +92,7 @@ object DataSource {
             roomType = "Appartement",
         ),
         Booking(
+            id = 7,
             hotel = "Nomad",
             place = "Libreville",
             status = BookingStatus.CANCELED,

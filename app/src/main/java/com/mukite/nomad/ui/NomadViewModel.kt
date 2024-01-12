@@ -103,4 +103,10 @@ class NomadViewModel : ViewModel() {
         }
     }
 
+    fun onSearchQueryChange(query: String) {
+        _uiState.update { currentValue ->
+            currentValue.copy(searchQuery = query)
+        }
+    }
+
 }

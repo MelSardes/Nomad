@@ -17,7 +17,8 @@ data class NomadUiState(
     val personalInformation: PersonalInformation = PersonalInformation(),
     val totalPrice: Long = 0,
     val selectedRoomType: RoomType = RoomType.SUITE,
-    val selectedBookingHistoryItem: Booking? = null
+    val selectedBookingHistoryItem: Booking? = null,
+    val searchQuery: String = "",
 )
 
 data class PersonalInformation(

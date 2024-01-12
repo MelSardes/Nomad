@@ -1,6 +1,7 @@
 package com.mukite.nomad.data.model
 
 data class Booking(
+    val id: Int,
     val hotel: String,
     val place: String,
     val status: BookingStatus,
