@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -76,7 +77,7 @@ fun Settings(
                 title = {
                     Text(
                         text = stringResource(id = R.string.profile),
-                        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.titleMedium
                     )
                 },
                 scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(appBarScrollState)
@@ -164,10 +165,7 @@ fun SettingItem(
             Text(
                 text = title,
                 textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.titleSmall.copy(
-                    fontWeight = FontWeight.Medium,
-                    color = exitColor
-                )
+                style = MaterialTheme.typography.titleSmall.copy(color = exitColor)
             )
         }
     }
@@ -185,15 +183,13 @@ fun ProfileSection(modifier: Modifier = Modifier) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(R.string.user_profile_name),
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.SemiBold
-                ),
+                style = MaterialTheme.typography.titleMedium,
                 modifier = modifier
             )
 
             Text(
                 text = stringResource(R.string.user_profile_email),
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.labelSmall,
                 modifier = modifier
             )
         }
@@ -217,7 +213,7 @@ fun ProfileSection(modifier: Modifier = Modifier) {
                 Text(
                     text = stringResource(R.string.user_profile_location),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
                 )
             }
         }
@@ -227,15 +223,16 @@ fun ProfileSection(modifier: Modifier = Modifier) {
 @Composable
 fun ProfilePhotoSection(modifier: Modifier = Modifier) {
     Box(modifier = modifier
-        .size(150.dp)
+        .size(120.dp)
         .clip(CircleShape)
+        .background(MaterialTheme.colorScheme.secondaryContainer),
+        contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.avatar),
+        Icon(
+            imageVector = Icons.Default.Person,
             contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            alignment = Alignment.Center
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.fillMaxSize(0.8f)
         )
     }
 }
