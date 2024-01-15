@@ -52,8 +52,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -68,6 +70,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -98,70 +101,41 @@ import java.util.Locale
 
 @Composable
 fun HeaderSection(modifier: Modifier = Modifier) {
-/*
-    val context = LocalContext.current
-
-    val mediaItem = MediaItem.Builder()
-        .setUri("asset:///nomad_hotel")
-        .build()
-
-    val exoPlayer = remember(context, mediaItem) {
-        ExoPlayer.Builder(context)
-            .build()
-            .also { exoPlayer ->
-                exoPlayer.setMediaItem(mediaItem)
-                exoPlayer.prepare()
-                exoPlayer.playWhenReady = true
-                exoPlayer.repeatMode = REPEAT_MODE_ONE
-            }
-    }
-
-    DisposableEffect(
-        AndroidView(factory = {
-            PlayerView(context).apply {
-                player = exoPlayer
-            }
-        })
-    ) {
-        onDispose { exoPlayer.release() }
-    }
-*/
-
 
     Column(modifier = modifier) {
         Text(
             text = stringResource(R.string.nomad_hotel_full_name),
             color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
 
         Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.Top,
             modifier = Modifier.fillMaxWidth()
         ) {
             Image(
                 imageVector = Icons.Rounded.LocationOn,
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(end = 4.dp)
-                    .size(12.dp)
+                    .size(8.dp)
             )
 
             Text(
                 text = stringResource(R.string.hotel_location),
                 style = MaterialTheme.typography.labelSmall,
-                textAlign = TextAlign.Start,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
             )
         }
     }
 }
 
-@androidx.annotation.OptIn(UnstableApi::class) @Composable
+@androidx.annotation.OptIn(UnstableApi::class)
+@Composable
 fun VideoPlayer(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val videoPath = "android.resource://${context.packageName}/${R.raw.nomad_hotel}"
@@ -310,8 +284,7 @@ fun DescriptionSection(modifier: Modifier = Modifier) {
                     }
 
             },
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Justify
         )
     }
@@ -319,31 +292,40 @@ fun DescriptionSection(modifier: Modifier = Modifier) {
 
 @Composable
 fun GallerySection(modifier: Modifier = Modifier, onImageClick: (image: Int) -> Unit) {
-    Column(horizontalAlignment = Alignment.Start, modifier = modifier) {
+    Column(
+        horizontalAlignment = Alignment.Start,
+        modifier = modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+    ) {
         HeaderSectionTitle(
             title = R.string.photo_gallery,
             link = R.string.see_all,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier,
+            onClickLink = { onImageClick(galleryImages.first()) }
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        LazyRow(
-            modifier = Modifier.height(112.dp)
+        Box(
+            modifier = Modifier
+                .height(112.dp)
+                .clickable { onImageClick(galleryImages.first()) }
         ) {
 
-            item {
-                Spacer(modifier = Modifier.width(16.dp))
-            }
-            items(galleryImages) { image ->
+            galleryImages.forEachIndexed { index, image ->
+                val leftPadding = index*12.dp
+                val rotationValue = index*1.2f
+
                 Box(
                     modifier = Modifier
+                        .padding(start = leftPadding)
+                        .rotate(rotationValue)
                         .fillMaxHeight()
                         .width(132.dp)
-                        .offset(x = ((-20)*galleryImages.indexOf(image)).dp)
                         .shadow(6.dp, RoundedCornerShape(12.dp), spotColor = Color.Black)
-                        .clip(RoundedCornerShape(12.dp))
-                        .clickable { onImageClick(galleryImages.indexOf(image)) },
+                        .clip(RoundedCornerShape(12.dp)),
+//                        ,
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
@@ -398,7 +380,12 @@ fun DialogImageViewer(initialPage: Int, onClose: () -> Unit) {
 }
 
 @Composable
-fun HeaderSectionTitle(@StringRes title: Int, modifier: Modifier = Modifier, @StringRes link: Int? = null) {
+fun HeaderSectionTitle(
+    @StringRes title: Int,
+    modifier: Modifier = Modifier,
+    @StringRes link: Int? = null,
+    onClickLink: () -> Unit = {}
+) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -416,7 +403,8 @@ fun HeaderSectionTitle(@StringRes title: Int, modifier: Modifier = Modifier, @St
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
-                textDecoration = TextDecoration.Underline
+                textDecoration = TextDecoration.Underline,
+                modifier = Modifier.clickable { onClickLink() }
             )
         }
     }
@@ -441,9 +429,9 @@ fun NewsSection(modifier: Modifier = Modifier, navigateToArticle: (news: News) -
 fun NewsItem(news: News, modifier: Modifier = Modifier, onClick: () -> Unit) {
     ElevatedCard(
         modifier = modifier.size(280.dp, 100.dp),
-        elevation = CardDefaults.cardElevation(2.dp),
+        elevation = CardDefaults.cardElevation(0.1.dp),
         onClick = { onClick() },
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(green = 0.97f))
+//        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(green = 0.97f))
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier
@@ -466,8 +454,7 @@ fun NewsItem(news: News, modifier: Modifier = Modifier, onClick: () -> Unit) {
                 Text(
                     text = stringResource(id = news.title).lowercase().replaceFirstChar { it.uppercase() },
 //                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.bodyMedium ,
-                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.titleSmall ,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
@@ -487,42 +474,48 @@ fun NewsItem(news: News, modifier: Modifier = Modifier, onClick: () -> Unit) {
 @Composable
 fun WeatherSection(modifier: Modifier = Modifier, onClick: () -> Unit) {
     val fourNextDays = generateNext4Days()
+
     Surface(modifier = modifier.clickable { onClick() }, tonalElevation = 4.dp, shape = RoundedCornerShape(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
         ) {
-            fourNextDays.forEach {
-                DayItem(day = it)
+            fourNextDays.forEach { todayDate ->
+                DayItem(
+                    day = todayDate.format(DateTimeFormatter.ofPattern("EEEE").withLocale(Locale.FRANCE)),
+                    date = todayDate.format(DateTimeFormatter.ofPattern("d MMM").withLocale(Locale.FRANCE)),
+                    icon = weatherIconsList.random(),
+                    temperature = "${(18..38).random()}°"
+                )
             }
         }
     }
 }
 
 @Composable
-fun DayItem(day: LocalDate, modifier: Modifier = Modifier) {
+fun DayItem(day: String, date: String, icon: Int, temperature: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = day.format(DateTimeFormatter.ofPattern("EEE").withLocale(Locale.FRANCE)),
+            text = day,
             color = MaterialTheme.colorScheme.secondary,
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold
         )
         Text(
-            text = day.format(DateTimeFormatter.ofPattern("d MMM").withLocale(Locale.FRANCE)),
+            text = date,
             color = MaterialTheme.colorScheme.secondary,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelSmall,
         )
         Spacer(modifier = Modifier.height(12.dp))
         Image(
-            painter = painterResource(id = weatherIconsList.random()),
+            painter = painterResource(id = icon),
             contentDescription = null,
             modifier = Modifier.size(32.dp)
         )
         Text(
-            text = "${(18..38).random()}°",
+            text = temperature,
             color = MaterialTheme.colorScheme.secondary,
-            style = MaterialTheme.typography.displaySmall,
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold
         )
     }
