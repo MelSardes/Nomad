@@ -21,7 +21,7 @@
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-01-12T13:15:02.076568100Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-01-15T07:52:22.420474600Z" />
           <multipleDevicesSelectedInDropDown value="true" />
           <runningDeviceTargetsSelectedWithDialog>
             <Target>
@@ -37,8 +37,8 @@
               <type value="RUNNING_DEVICE_TARGET" />
               <deviceKey>
                 <Key>
-                  <type value="SERIAL_NUMBER" />
-                  <value value="192.168.1.65:5555" />
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\SlymDev\.android\avd\Nexus_S_API_29.avd" />
                 </Key>
               </deviceKey>
             </Target>

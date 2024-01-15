@@ -3,12 +3,18 @@ package com.mukite.nomad.ui.bookingHistory
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -26,18 +32,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mukite.nomad.R
-import com.mukite.nomad.data.NomadUiState
-import com.mukite.nomad.data.model.Booking
+import com.mukite.nomad.data.model.BookingStatus
 import com.mukite.nomad.ui.NomadViewModel
 import com.mukite.nomad.ui.booking_details.InfoSection
 import com.mukite.nomad.utils.calculateDaysDifference
-import com.mukite.nomad.utils.formatLongToDate
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -60,31 +64,50 @@ fun BookingHistoryDetails(viewModel: NomadViewModel, modifier: Modifier, onBackP
     }
 
     Column(
-        modifier = modifier,
-//            .height(IntrinsicSize.Max),
+        modifier = modifier.verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.Start
     ) {
         TopBar() { onBackPressed() }
         Column(modifier = Modifier
             .padding(8.dp)
             .background(MaterialTheme.colorScheme.surface)
-//            .border(
-//                width = 1.dp,
-//                shape = RoundedCornerShape(4.dp),
-//                color = MaterialTheme.colorScheme.outlineVariant
-//            )
-            .padding(vertical = 32.dp, horizontal = 16.dp),
+            .padding(vertical = 24.dp, horizontal = 16.dp),
         ) {
             InfoSection(
-                "Date de réservation",
-                booking?.date ?: "Date non renseignée",
+                "Code de réservation",
+                booking?.reservationCode ?: "Code non renseigné",
                 modifier = Modifier.fillMaxWidth()
             )
-
-
             Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
 
-            InfoSection("Statut", "En attente", modifier = Modifier.fillMaxWidth())
+            InfoSection(
+                "Date de réservation",
+                genericDateToLocalFrDateFormatter(booking?.date, true),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+
+            InfoSection(
+                "Statut",
+                when (booking?.status) {
+                    BookingStatus.ONGOING -> "En cours"
+                    BookingStatus.COMPLETED -> "Complet"
+                    BookingStatus.CANCELED -> "Annulé"
+                    else -> "Statut non renseigné"
+                },
+                modifier = Modifier.fillMaxWidth(),
+                dataTextModifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(
+                        when (booking?.status) {
+                            BookingStatus.ONGOING -> Color(0xFFA9D6E5)
+                            BookingStatus.COMPLETED -> Color(0xFFB7E4C7)
+                            BookingStatus.CANCELED -> MaterialTheme.colorScheme.errorContainer
+                            else -> Color.Transparent
+                        }
+                    )
+                    .padding(4.dp)
+            )
             Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
 
             InfoSection(
@@ -96,16 +119,16 @@ fun BookingHistoryDetails(viewModel: NomadViewModel, modifier: Modifier, onBackP
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(100.dp)
+                horizontalArrangement = Arrangement.spacedBy(space = 16.dp, alignment = Alignment.Start),
             ) {
                 InfoSection(
                     "Date d'arrivée",
-                    booking?.checkIn ?: "Date non renseignée",
+                    genericDateToLocalFrDateFormatter(booking?.checkIn, true),
                     modifier = Modifier.weight(1f)
                 )
                 InfoSection(
                     "Date de départ",
-                    booking?.checkOut ?: "Date non renseignée",
+                    genericDateToLocalFrDateFormatter(booking?.checkOut, true),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -137,7 +160,7 @@ private fun TopBar(title: Int = R.string.booking_details, onBack: () -> Unit) {
         title = {
             Text(
                 text = stringResource(id = title),
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.titleMedium
             )
         },
         navigationIcon = {
