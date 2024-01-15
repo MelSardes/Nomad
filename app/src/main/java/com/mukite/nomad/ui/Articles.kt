@@ -50,7 +50,7 @@ fun Article(viewModel: NomadViewModel, onBack: () -> Unit) {
             title = {
                 Text(
                     text = "Evenementiel",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.titleMedium
                 )
             },
             navigationIcon = {

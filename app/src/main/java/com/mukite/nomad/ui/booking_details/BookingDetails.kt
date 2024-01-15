@@ -21,8 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -378,7 +376,7 @@ fun ReservationSummary(uiState: NomadUiState, modifier: Modifier, onBackPressed:
 }
 
 @Composable
-fun InfoSection(title: String, data: String, modifier: Modifier = Modifier) {
+fun InfoSection(title: String, data: String, modifier: Modifier = Modifier, dataTextModifier: Modifier = Modifier) {
     Column(
         modifier = modifier.padding(vertical = 16.dp),
         horizontalAlignment = Alignment.Start
@@ -393,6 +391,7 @@ fun InfoSection(title: String, data: String, modifier: Modifier = Modifier) {
             text = data,
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+            modifier = dataTextModifier
         )
     }
 }
