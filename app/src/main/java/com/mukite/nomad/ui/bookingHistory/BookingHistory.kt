@@ -1,9 +1,8 @@
 package com.mukite.nomad.ui.bookingHistory
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,19 +16,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Timelapse
-import androidx.compose.material.icons.sharp.Cancel
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -53,8 +51,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -67,6 +63,9 @@ import com.mukite.nomad.data.model.BookingStatus
 import com.mukite.nomad.ui.NomadViewModel
 import com.mukite.nomad.utils.calculateDaysDifference
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,7 +124,9 @@ fun BookingHistory(
             ) {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
                 ) {
                     item {
                         Text(
@@ -172,7 +173,7 @@ private fun TopBar(onSearchIconTap: () -> Unit = {}) {
         title = {
             Text(
                 text = stringResource(id = R.string.reservations),
-                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.titleMedium
             )
         },
         actions = {
@@ -226,7 +227,7 @@ private fun ChipsOptions(
 ) {
 
     Row(
-        modifier = modifier,
+        modifier = modifier.horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(
             alignment = Alignment.CenterHorizontally,
             space = 8.dp
@@ -241,8 +242,14 @@ private fun ChipsOptions(
                     if (selectedChip == newIndex) onChipSelected(0)
                     else onChipSelected(newIndex)
                 },
-                leadingIcon = { Icon(imageVector = icon, contentDescription = null) },
-                label = { Text(chipTag) },
+                leadingIcon = { Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                ) },
+                label = {
+                    Text(chipTag, style = MaterialTheme.typography.labelMedium)
+                },
                 colors = InputChipDefaults.inputChipColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     selectedContainerColor = when (newIndex) {
@@ -306,20 +313,21 @@ fun BookingCard(booking: Booking, modifier: Modifier = Modifier, onClick: () -> 
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(space = 16.dp, alignment = Alignment.Start),
+                    verticalAlignment = Alignment.Top,
                 ) {
                     Column(Modifier.weight(1f)) {
                         Text(
-                            text = "Date de réservation",
+                            text = "Réservé le",
                             textAlign = TextAlign.Start,
                             style = MaterialTheme.typography.labelMedium.copy(
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.tertiary
                             )
                         )
+
                         Text(
-                            text = booking.checkIn,
+                            text = genericDateToLocalFrDateFormatter(booking.date),
                             textAlign = TextAlign.Start,
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -346,7 +354,7 @@ fun BookingCard(booking: Booking, modifier: Modifier = Modifier, onClick: () -> 
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(space = 16.dp, alignment = Alignment.Start),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(Modifier.weight(1f)) {
@@ -359,7 +367,7 @@ fun BookingCard(booking: Booking, modifier: Modifier = Modifier, onClick: () -> 
                             )
                         )
                         Text(
-                            text = booking.checkIn,
+                            text = genericDateToLocalFrDateFormatter(booking.checkIn),
                             textAlign = TextAlign.Start,
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -375,7 +383,7 @@ fun BookingCard(booking: Booking, modifier: Modifier = Modifier, onClick: () -> 
                             )
                         )
                         Text(
-                            text = booking.checkOut,
+                            text = genericDateToLocalFrDateFormatter(booking.checkOut),
                             textAlign = TextAlign.Start,
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -386,13 +394,27 @@ fun BookingCard(booking: Booking, modifier: Modifier = Modifier, onClick: () -> 
                 Text(
                     text = "${daysDifference * booking?.price!!} Fcfa",
                     color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 )
             }
         }
     }
 }
 
+
+internal fun genericDateToLocalFrDateFormatter(stringDate: String?, withWeekDay: Boolean = false): String {
+
+    stringDate ?: return "N/A"
+
+    // Parse the input string to a LocalDate object
+    val localDate = LocalDate.parse(stringDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+
+    // Format the LocalDate with the desired pattern including the day of the week
+    val dateFormatter = DateTimeFormatter.ofPattern(if (withWeekDay) "EEEE\ndd MMMM yyyy" else "dd MMMM yyyy").withLocale(Locale.FRANCE)
+    val formattedDate = localDate.format(dateFormatter)
+
+    return formattedDate
+}
 
 @Preview(name = "Booking Card")
 @Composable
