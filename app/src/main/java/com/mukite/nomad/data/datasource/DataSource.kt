@@ -18,6 +18,18 @@ object DataSource {
         Service.ClothesService,
     )
 
+    val equipment_and_services = listOf(
+        Service.QueenSizeBed,
+        Service.TV,
+        Service.Bathtub,
+        Service.Strongbox,
+        Service.Kitchen,
+        Service.airConditioning,
+        Service.UnlimitedInternet,
+        Service.Pool,
+        Service.Parking,
+    )
+
     val bookingSampleList = listOf(
         Booking(
             id = 1,
@@ -127,6 +139,7 @@ object DataSource {
     )
 
 
+/*
     val galleryImages = listOf(
         R.drawable.gallerie1,
         R.drawable.gallerie2,
@@ -138,6 +151,7 @@ object DataSource {
         R.drawable.gallerie8,
         R.drawable.gallerie9,
     )
+*/
 
 
     val weatherIconsList = listOf(
@@ -150,6 +164,15 @@ object DataSource {
         R.drawable.sun_rain2,
         R.drawable.thunderstorm,
         R.drawable.thunderstorm_rain,
+    )
+
+    val suitesPhotos = listOf(
+        R.drawable.suite_1,
+        R.drawable.suite_2,
+        R.drawable.suite_3,
+        R.drawable.suite_4,
+        R.drawable.suite_5,
+        R.drawable.suite_6,
     )
 }
 

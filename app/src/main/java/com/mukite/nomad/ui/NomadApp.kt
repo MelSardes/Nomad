@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.rounded.BedroomParent
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.List
 import androidx.compose.material.icons.rounded.Settings
@@ -46,7 +47,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 import com.mukite.nomad.R
-import com.mukite.nomad.SplashScreen
 import com.mukite.nomad.ui.bookingHistory.BookingHistory
 import com.mukite.nomad.ui.bookingHistory.BookingHistoryDetails
 import com.mukite.nomad.ui.booking_details.BookingDetails
@@ -63,7 +63,8 @@ enum class NomadScreen(@StringRes val title: Int) {
     SelectDate(title = R.string.select_date),
     BookingHistoryItem(title = R.string.booking_history_item),
     EmptyState(title = R.string.empty_state),
-    ArticleDetails(title = R.string.article_details)
+    ArticleDetails(title = R.string.article_details),
+    Suites(title = R.string.our_suites)
 }
 
 enum class BottomNavigationItem(
@@ -83,6 +84,12 @@ enum class BottomNavigationItem(
         Icons.Rounded.List
     ),
 
+    Suites(
+        NomadScreen.Suites.name,
+        R.string.our_suites,
+        Icons.Rounded.BedroomParent
+    ),
+
     Settings(
         NomadScreen.Settings.name,
         R.string.settings,
@@ -92,6 +99,7 @@ enum class BottomNavigationItem(
 
 val bottomNavigationItems = listOf(
     BottomNavigationItem.Home,
+    BottomNavigationItem.Suites,
     BottomNavigationItem.Bookings,
     BottomNavigationItem.Settings
 )
@@ -263,6 +271,12 @@ private fun NomadNavContent(
                 BookingHistory(viewModel = viewModel, modifier = Modifier.fillMaxSize()) {
                     navController.navigate(NomadScreen.BookingHistoryItem.name)
                 }
+            }
+        }
+
+        composable(route = BottomNavigationItem.Suites.route) {
+            Surface {
+                Suites(modifier = Modifier.fillMaxSize(), navigateToDateSelection = { navController.navigate(NomadScreen.BookingDetails.name) })
             }
         }
 

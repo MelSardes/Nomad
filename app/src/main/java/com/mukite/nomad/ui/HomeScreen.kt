@@ -51,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mukite.nomad.R
 import com.mukite.nomad.data.model.News
+import com.mukite.nomad.data.model.PhotosGalleryType
 
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -63,13 +64,13 @@ fun HomeScreen(
 ) {
     val verticalScrollState = rememberScrollState()
     val dialogImageViewerOpened = remember { mutableStateOf(false) }
-    var selectedImage by remember {
-        mutableIntStateOf(0)
+    var selectedImageType by remember {
+        mutableStateOf(PhotosGalleryType.ESTABLISHMENT)
     }
     val haptic = LocalHapticFeedback.current
 
     AnimatedVisibility(visible = dialogImageViewerOpened.value) {
-        DialogImageViewer(selectedImage) {
+        DialogImageViewer(selectedImageType) {
             dialogImageViewerOpened.value = false
         }
     }
@@ -154,7 +155,7 @@ fun HomeScreen(
 
             GallerySection(modifier = Modifier.fillMaxWidth()) {
                 dialogImageViewerOpened.value = true
-                selectedImage = it
+                selectedImageType = it
             }
 
             Spacer(modifier = Modifier.height(24.dp))

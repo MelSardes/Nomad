@@ -62,4 +62,15 @@
     <string name="empty_state">Empty State</string>
     <string name="article_details">Article details</string>
     <string name="settings">Parametres</string>
+    <string name="our_suites">Nos suites</string>
+    <string name="equipment_and_services">Équipement et services</string>
+    <string name="queenSizeBed">Lit Queen Size</string>
+    <string name="tv">TV écran plat</string>
+    <string name="bathtub">Baignoire - Douche</string>
+    <string name="strongbox">Coffre-fort</string>
+    <string name="kithen">Kitchenette</string>
+    <string name="air_conditioning">Climatisation</string>
+    <string name="pool">Piscine</string>
+    <string name="parking">Parking gratuit</string>
+    <string name="suites_description">Proposant une vue sur les jardins et la piscine, nos 40 suites de 45m2 joliment décorées aux couleurs des différents continents sont personnalisées et équipées des dernières technologies.\nSpacieuses et chics, élégantes et raffinées, toutes les Suites disposent d’une chambre, d’un salon, d’une kitchenette et d’une terrasse privative donnant sur les jardins aux senteurs de fleurs exotiques.</string>
 </resources>

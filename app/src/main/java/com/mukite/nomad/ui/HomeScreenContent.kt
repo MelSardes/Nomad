@@ -2,16 +2,16 @@ package com.mukite.nomad.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,22 +19,22 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.rounded.LocationOn
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,11 +42,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,9 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -74,27 +74,30 @@ import androidx.compose.ui.unit.times
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.zIndex
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
-import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.media3.common.Player.REPEAT_MODE_ONE
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultDataSourceFactory
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.SimpleExoPlayer
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.extractor.text.webvtt.WebvttCssStyle.FontSizeUnit
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.mukite.nomad.R
 import com.mukite.nomad.data.datasource.DataSource
-import com.mukite.nomad.data.datasource.DataSource.galleryImages
 import com.mukite.nomad.data.datasource.DataSource.newsList
 import com.mukite.nomad.data.datasource.DataSource.weatherIconsList
+import com.mukite.nomad.data.datasource.photosGalleryDataSource.cateringServicePhotosGallery
+import com.mukite.nomad.data.datasource.photosGalleryDataSource.establishmentPhotosGallery
+import com.mukite.nomad.data.datasource.photosGalleryDataSource.eventsPhotosGallery
+import com.mukite.nomad.data.datasource.photosGalleryDataSource.newsPhotosGallery
 import com.mukite.nomad.data.model.News
+import com.mukite.nomad.data.model.PhotosGalleryType
 import com.mukite.nomad.data.model.Service
 import com.mukite.nomad.utils.MapScreen
 import com.mukite.nomad.utils.generateNext4Days
-import java.time.LocalDate
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -220,33 +223,64 @@ fun ServicesSection(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ServiceItem(modifier: Modifier = Modifier, service: Service) {
-    Surface(
-        modifier = modifier.size(72.dp),
-        tonalElevation = 0.1.dp,
-        shape = RoundedCornerShape(4.dp),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally,
+fun ServiceItem(modifier: Modifier = Modifier, service: Service, horizontal: Boolean = false) {
+    if (horizontal) {
+        Surface(
+            modifier = modifier.height(72.dp).width(IntrinsicSize.Max),
+            tonalElevation = 0.1.dp,
+            shape = RoundedCornerShape(4.dp),
         ) {
-            Icon(
-                imageVector = service.icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = stringResource(id = service.name),
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 2,
-                softWrap = true,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = service.icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = stringResource(id = service.name),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    softWrap = false,
+                    modifier = Modifier,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+    } else {
+        Surface(
+            modifier = modifier.size(72.dp),
+            tonalElevation = 0.1.dp,
+            shape = RoundedCornerShape(4.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Icon(
+                    imageVector = service.icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = stringResource(id = service.name),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 2,
+                    softWrap = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
@@ -291,91 +325,290 @@ fun DescriptionSection(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun GallerySection(modifier: Modifier = Modifier, onImageClick: (image: Int) -> Unit) {
+fun GallerySection(modifier: Modifier = Modifier, onImageClick: (type: PhotosGalleryType) -> Unit) {
     Column(
         horizontalAlignment = Alignment.Start,
-        modifier = modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         HeaderSectionTitle(
             title = R.string.photo_gallery,
-            link = R.string.see_all,
-            modifier = Modifier,
-            onClickLink = { onImageClick(galleryImages.first()) }
+            modifier = Modifier.padding(horizontal = 16.dp),
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Box(
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
             modifier = Modifier
-                .height(112.dp)
-                .clickable { onImageClick(galleryImages.first()) }
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+        ) {
+            Spacer(modifier = Modifier)
+
+            Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier.clickable {
+                        onImageClick(PhotosGalleryType.ESTABLISHMENT)
+                    },
+                ) {
+
+                    establishmentPhotosGallery.take(3).forEachIndexed { index, image ->
+                        val leftPadding = index*20.dp
+                        val boxWidth = (132 - (index*10)).dp
+                        val ratio = 132f/112f
+                        val imageHeight = (boxWidth*ratio)
+
+
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .padding(start = leftPadding)
+                                .height(imageHeight)
+                                .width(boxWidth)
+                                .shadow(10.dp, RoundedCornerShape(4.dp), spotColor = Color.Black)
+                                .clip(RoundedCornerShape(4.dp))
+                                .zIndex((-index).toFloat()),
+                        ) {
+                            Image(
+                                painter = painterResource(id = image),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
+
+                Text(
+                    text = "Établissement",
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 2
+                )
+
+            }
+
+            Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier.clickable {
+                        onImageClick(PhotosGalleryType.CATERING_AND_RESTAURANT)
+                    },
+                ) {
+
+                    cateringServicePhotosGallery.take(3).forEachIndexed { index, image ->
+                        val leftPadding = index * 20.dp
+                        val boxWidth = (132 - (index * 10)).dp
+                        val ratio = 132f / 112f
+                        val imageHeight = (boxWidth * ratio)
+
+
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .padding(start = leftPadding)
+                                .height(imageHeight)
+                                .width(boxWidth)
+                                .shadow(10.dp, RoundedCornerShape(4.dp), spotColor = Color.Black)
+                                .clip(RoundedCornerShape(4.dp))
+                                .zIndex((-index).toFloat()),
+                        ) {
+                            Image(
+                                painter = painterResource(id = image),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
+
+                Text(
+                    text = "Restaurant & Service traiteur",
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 2
+                )
+            }
+
+            Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier.clickable {
+                        onImageClick(PhotosGalleryType.EVENTS)
+                    },
+                ) {
+
+                    eventsPhotosGallery.take(3).forEachIndexed { index, image ->
+                        val leftPadding = index * 20.dp
+                        val boxWidth = (132 - (index * 10)).dp
+                        val ratio = 132f / 112f
+                        val imageHeight = (boxWidth * ratio)
+
+
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .padding(start = leftPadding)
+                                .height(imageHeight)
+                                .width(boxWidth)
+                                .shadow(8.dp, RoundedCornerShape(4.dp), spotColor = Color.Black)
+                                .clip(RoundedCornerShape(4.dp))
+                                .zIndex((-index).toFloat()),
+                        ) {
+                            Image(
+                                painter = painterResource(id = image),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
+                Text(
+                    text = "Évènements",
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 2
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Preview(showSystemUi = false, showBackground = true)
+@Composable
+fun GallerySectionPreview() {
+    GallerySection(modifier = Modifier, onImageClick = { })
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ImagesPager(imageType: PhotosGalleryType, onClose: () -> Unit) {
+
+    val galleryImages = when (imageType) {
+        PhotosGalleryType.ESTABLISHMENT -> establishmentPhotosGallery
+        PhotosGalleryType.CATERING_AND_RESTAURANT -> cateringServicePhotosGallery
+        PhotosGalleryType.EVENTS -> eventsPhotosGallery
+        PhotosGalleryType.NEWS -> newsPhotosGallery
+    }
+    val scope = rememberCoroutineScope()
+    val state = rememberPagerState(initialPage = 0) { galleryImages.size }
+
+    Column(
+        modifier = Modifier
+            .height(400.dp)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
+            verticalAlignment = Alignment.Bottom
         ) {
 
-            galleryImages.forEachIndexed { index, image ->
-                val leftPadding = index*12.dp
-                val rotationValue = index*1.2f
+            Text(
+                text = imageType.value,
+                color = Color.White,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                modifier = Modifier.weight(1f)
+            )
 
-                Box(
-                    modifier = Modifier
-                        .padding(start = leftPadding)
-                        .rotate(rotationValue)
-                        .fillMaxHeight()
-                        .width(132.dp)
-                        .shadow(6.dp, RoundedCornerShape(12.dp), spotColor = Color.Black)
-                        .clip(RoundedCornerShape(12.dp)),
-//                        ,
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = image),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+            Text(
+                "${state.currentPage + 1}/${galleryImages.size}",
+                color = Color.White,
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+                modifier = Modifier
+            )
+
+            IconButton(
+                onClick = { onClose() },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colorScheme.inversePrimary
+                )
+            }
+        }
+
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        HorizontalPager(
+            state = state,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+        ) { image ->
+            Image(
+                painter = painterResource(id = galleryImages[image]),
+                contentDescription = null,
+                modifier = Modifier,
+                contentScale = ContentScale.FillWidth,
+                alignment = Alignment.Center
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally)
+        ) {
+
+            ElevatedButton(
+                enabled = state.currentPage != 0,
+                onClick = {
+                    scope.launch {
+                        state.animateScrollToPage(
+                            state.currentPage - 1,
+                            pageOffsetFraction = 0f,
+                            animationSpec = spring(stiffness = 800f, dampingRatio = 0.8f),
+                        )
+                    }
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronLeft,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+//                        tint = Color.White,
+                )
+            }
+
+
+            ElevatedButton(
+                enabled = state.currentPage != galleryImages.size - 1,
+//                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer, contentColor = MaterialTheme.colorScheme.onTertiaryContainer),
+                onClick = {
+                    scope.launch {
+                        state.animateScrollToPage(
+                            state.currentPage + 1,
+                            pageOffsetFraction = 0f,
+                            animationSpec = spring(stiffness = 800f, dampingRatio = 0.8f),
+                        )
+                    }
                 }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                )
             }
         }
     }
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ImagesPager(initialPage: Int, onClose: () -> Unit) {
-    val state = rememberPagerState(initialPage = initialPage) { galleryImages.size }
-    Column(modifier = Modifier
-        .height(400.dp)
-        .fillMaxSize(), horizontalAlignment = Alignment.End) {
-        IconButton(
-            onClick = { onClose() },
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = null,
-                modifier = Modifier.size(32.dp),
-                tint = Color.White
-            )
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        HorizontalPager(state = state, modifier = Modifier.weight(1f)) { image ->
-            Image(
-                painter = painterResource(id = galleryImages[image]),
-                contentDescription = null,
-                modifier = Modifier,
-                contentScale = ContentScale.FillWidth
-            )
-        }
-    }
-}
-
-@Composable
-fun DialogImageViewer(initialPage: Int, onClose: () -> Unit) {
+fun DialogImageViewer(imageType: PhotosGalleryType, onClose: () -> Unit) {
     Dialog(onDismissRequest = { /*TODO*/ }, properties = DialogProperties(true, true)) {
-        ImagesPager(initialPage = initialPage, onClose = onClose)
+        ImagesPager(imageType = imageType, onClose = onClose)
     }
 }
 
