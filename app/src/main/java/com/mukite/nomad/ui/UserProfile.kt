@@ -136,7 +136,6 @@ fun Settings(
 
 val settingList = listOf(
     Icons.Filled.Person to "Modifier le profil",
-    Icons.Filled.List to "Mon historique",
     Icons.Filled.Notifications to "Notifications",
     Icons.Filled.Help to "Aide",
     Icons.Filled.Warning to "FAQ",
