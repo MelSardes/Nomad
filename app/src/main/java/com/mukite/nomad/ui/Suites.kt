@@ -30,6 +30,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -102,15 +103,36 @@ fun Suites(modifier: Modifier = Modifier, navigateToDateSelection: () -> Unit) {
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            Text(
-                text = stringResource(R.string.our_suites),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Start,
-                textDecoration = TextDecoration.Underline
-            )
+            Column(modifier = Modifier.width(IntrinsicSize.Max), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = stringResource(R.string.nomad_hotel_full_name),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
+                )
+
+                // render pdf document
+
+
+
+
+                Divider(
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.inversePrimary,
+                    modifier = Modifier.fillMaxWidth(.2f)
+                )
+                Divider(
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.inversePrimary,
+                    modifier = Modifier.fillMaxWidth(.5f)
+                )
+                Divider(
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.inversePrimary,
+                    modifier = Modifier.fillMaxWidth(.2f)
+                )
+            }
 
             Amenities()
 
@@ -148,6 +170,18 @@ fun Suites(modifier: Modifier = Modifier, navigateToDateSelection: () -> Unit) {
         }
 
         Spacer(modifier = Modifier.height(44.dp))
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)) {
+            Image(
+                painter = painterResource(id = R.drawable.disney_plus_banner_ad_example),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        Spacer(modifier = Modifier.height(44.dp))
+
     }
 }
 

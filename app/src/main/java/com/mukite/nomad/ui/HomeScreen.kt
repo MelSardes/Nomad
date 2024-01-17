@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -69,7 +70,7 @@ fun HomeScreen(
     }
     val haptic = LocalHapticFeedback.current
 
-    AnimatedVisibility(visible = dialogImageViewerOpened.value) {
+    AnimatedVisibility(visible = dialogImageViewerOpened.value, modifier = Modifier.fillMaxSize()) {
         DialogImageViewer(selectedImageType) {
             dialogImageViewerOpened.value = false
         }
@@ -145,6 +146,19 @@ fun HomeScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)) {
+                Image(
+                    painter = painterResource(id = R.drawable.samsumg_banner_ad_example),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth
+                )
+            }
+
+
+            Spacer(modifier = Modifier.height(24.dp))
             Divider(color = Color.Black.copy(alpha = 0.1f), modifier = Modifier, thickness = 8.dp)
             Spacer(modifier = Modifier.height(24.dp))
             DescriptionSection(modifier = Modifier.padding(horizontal = 16.dp))
@@ -174,6 +188,18 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)) {
+                Image(
+                    painter = painterResource(id = R.drawable.ridge_banner_ad_examples),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth
+                )
+            }
+
         }
     }
 }

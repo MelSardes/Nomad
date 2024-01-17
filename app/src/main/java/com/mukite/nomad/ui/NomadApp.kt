@@ -243,7 +243,7 @@ private fun NomadNavContent(
 
         composable(route = BottomNavigationItem.Home.route) {
 //                Text(text = "Home")
-            Surface {
+            Surface(modifier = Modifier.fillMaxSize()) {
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     navigateToDateSelection = { navController.navigate(NomadScreen.BookingDetails.name) },

@@ -5,16 +5,22 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.Indication
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,18 +37,16 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.rounded.LocationOn
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -54,7 +58,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -80,7 +83,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player.REPEAT_MODE_ONE
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.extractor.text.webvtt.WebvttCssStyle.FontSizeUnit
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.mukite.nomad.R
@@ -95,8 +97,8 @@ import com.mukite.nomad.data.model.News
 import com.mukite.nomad.data.model.PhotosGalleryType
 import com.mukite.nomad.data.model.Service
 import com.mukite.nomad.utils.MapScreen
+import com.mukite.nomad.utils.bounceClick
 import com.mukite.nomad.utils.generateNext4Days
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -226,7 +228,9 @@ fun ServicesSection(modifier: Modifier = Modifier) {
 fun ServiceItem(modifier: Modifier = Modifier, service: Service, horizontal: Boolean = false) {
     if (horizontal) {
         Surface(
-            modifier = modifier.height(72.dp).width(IntrinsicSize.Max),
+            modifier = modifier
+                .height(72.dp)
+                .width(IntrinsicSize.Max),
             tonalElevation = 0.1.dp,
             shape = RoundedCornerShape(4.dp),
         ) {
@@ -336,146 +340,86 @@ fun GallerySection(modifier: Modifier = Modifier, onImageClick: (type: PhotosGal
         )
 
         Spacer(modifier = Modifier.height(12.dp))
+        PhotosGalleryRow { onImageClick(it) }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-        ) {
-            Spacer(modifier = Modifier)
-
-            Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier.clickable {
-                        onImageClick(PhotosGalleryType.ESTABLISHMENT)
-                    },
-                ) {
-
-                    establishmentPhotosGallery.take(3).forEachIndexed { index, image ->
-                        val leftPadding = index*20.dp
-                        val boxWidth = (132 - (index*10)).dp
-                        val ratio = 132f/112f
-                        val imageHeight = (boxWidth*ratio)
-
-
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .padding(start = leftPadding)
-                                .height(imageHeight)
-                                .width(boxWidth)
-                                .shadow(10.dp, RoundedCornerShape(4.dp), spotColor = Color.Black)
-                                .clip(RoundedCornerShape(4.dp))
-                                .zIndex((-index).toFloat()),
-                        ) {
-                            Image(
-                                painter = painterResource(id = image),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    }
-                }
-
-                Text(
-                    text = "Établissement",
-                    style = MaterialTheme.typography.labelSmall,
-                    maxLines = 2
-                )
-
-            }
-
-            Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier.clickable {
-                        onImageClick(PhotosGalleryType.CATERING_AND_RESTAURANT)
-                    },
-                ) {
-
-                    cateringServicePhotosGallery.take(3).forEachIndexed { index, image ->
-                        val leftPadding = index * 20.dp
-                        val boxWidth = (132 - (index * 10)).dp
-                        val ratio = 132f / 112f
-                        val imageHeight = (boxWidth * ratio)
-
-
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .padding(start = leftPadding)
-                                .height(imageHeight)
-                                .width(boxWidth)
-                                .shadow(10.dp, RoundedCornerShape(4.dp), spotColor = Color.Black)
-                                .clip(RoundedCornerShape(4.dp))
-                                .zIndex((-index).toFloat()),
-                        ) {
-                            Image(
-                                painter = painterResource(id = image),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    }
-                }
-
-                Text(
-                    text = "Restaurant & Service traiteur",
-                    style = MaterialTheme.typography.labelSmall,
-                    maxLines = 2
-                )
-            }
-
-            Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier.clickable {
-                        onImageClick(PhotosGalleryType.EVENTS)
-                    },
-                ) {
-
-                    eventsPhotosGallery.take(3).forEachIndexed { index, image ->
-                        val leftPadding = index * 20.dp
-                        val boxWidth = (132 - (index * 10)).dp
-                        val ratio = 132f / 112f
-                        val imageHeight = (boxWidth * ratio)
-
-
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .padding(start = leftPadding)
-                                .height(imageHeight)
-                                .width(boxWidth)
-                                .shadow(8.dp, RoundedCornerShape(4.dp), spotColor = Color.Black)
-                                .clip(RoundedCornerShape(4.dp))
-                                .zIndex((-index).toFloat()),
-                        ) {
-                            Image(
-                                painter = painterResource(id = image),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    }
-                }
-                Text(
-                    text = "Évènements",
-                    style = MaterialTheme.typography.labelSmall,
-                    maxLines = 2
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-        }
     }
 }
+
+
+@Composable
+fun PhotoGalleryBox(
+    photosGallery: List<Int>,
+    galleryType: PhotosGalleryType,
+    modifier: Modifier = Modifier,
+    onImageClick: (PhotosGalleryType) -> Unit
+) {
+
+    Box(
+        contentAlignment = Alignment.CenterStart,
+        modifier = Modifier.bounceClick {
+            onImageClick(galleryType)
+        },
+    ) {
+        photosGallery.take(3).forEachIndexed { index, image ->
+            val leftPadding = index * 20.dp
+            val boxWidth = (132 - (index * 10)).dp
+            val ratio = 132f / 112f
+            val imageHeight = (boxWidth * ratio)
+
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .padding(start = leftPadding)
+                    .height(imageHeight)
+                    .width(boxWidth)
+                    .shadow(elevation = 4.dp, shape = RoundedCornerShape(4.dp), spotColor = Color.Black)
+                    .clip(RoundedCornerShape(4.dp))
+                    .zIndex((-index).toFloat()),
+            ) {
+                Image(
+                    painter = painterResource(id = image),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+
+        Text(
+            text = galleryType.value,
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier
+                .padding(8.dp)
+                .clip(RoundedCornerShape(25))
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(4.dp)
+                .align(Alignment.BottomStart)
+        )
+    }
+}
+
+@Composable
+fun PhotosGalleryRow(onImageClick: (PhotosGalleryType) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+    ) {
+        Spacer(modifier = Modifier)
+
+        PhotoGalleryBox(establishmentPhotosGallery, PhotosGalleryType.ESTABLISHMENT) { onImageClick(it) }
+
+        PhotoGalleryBox(cateringServicePhotosGallery, PhotosGalleryType.CATERING_SERVICE) { onImageClick(it) }
+
+        PhotoGalleryBox(eventsPhotosGallery, PhotosGalleryType.EVENTS) { onImageClick(it) }
+
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
 
 @Preview(showSystemUi = false, showBackground = true)
 @Composable
@@ -486,11 +430,11 @@ fun GallerySectionPreview() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ImagesPager(imageType: PhotosGalleryType, onClose: () -> Unit) {
+fun ImagesPager(imageType: PhotosGalleryType, modifier: Modifier = Modifier, onClose: () -> Unit) {
 
     val galleryImages = when (imageType) {
         PhotosGalleryType.ESTABLISHMENT -> establishmentPhotosGallery
-        PhotosGalleryType.CATERING_AND_RESTAURANT -> cateringServicePhotosGallery
+        PhotosGalleryType.CATERING_SERVICE -> cateringServicePhotosGallery
         PhotosGalleryType.EVENTS -> eventsPhotosGallery
         PhotosGalleryType.NEWS -> newsPhotosGallery
     }
@@ -498,109 +442,118 @@ fun ImagesPager(imageType: PhotosGalleryType, onClose: () -> Unit) {
     val state = rememberPagerState(initialPage = 0) { galleryImages.size }
 
     Column(
-        modifier = Modifier
-            .height(400.dp)
-            .fillMaxWidth(),
+        modifier = modifier,
+//        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
-            verticalAlignment = Alignment.Bottom
-        ) {
-
-            Text(
-                text = imageType.value,
-                color = Color.White,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                modifier = Modifier.weight(1f)
-            )
-
-            Text(
-                "${state.currentPage + 1}/${galleryImages.size}",
-                color = Color.White,
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
-                modifier = Modifier
-            )
-
-            IconButton(
-                onClick = { onClose() },
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = null,
-                    modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.inversePrimary
-                )
-            }
-        }
-
-
-        Spacer(modifier = Modifier.height(32.dp))
 
         HorizontalPager(
             state = state,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+            contentPadding = PaddingValues(0.dp),
         ) { image ->
             Image(
                 painter = painterResource(id = galleryImages[image]),
                 contentDescription = null,
-                modifier = Modifier,
-                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Inside,
                 alignment = Alignment.Center
+            )
+        }
+
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Text(
+                text = imageType.value,
+                color = Color.White,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+//                modifier = Modifier.weight(1f)
+            )
+
+            Text(
+                "${state.currentPage + 1}/${galleryImages.size}",
+                color = Color.White,
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier
             )
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Row(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally)
+            verticalArrangement = Arrangement.spacedBy(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            ElevatedButton(
-                enabled = state.currentPage != 0,
-                onClick = {
-                    scope.launch {
-                        state.animateScrollToPage(
-                            state.currentPage - 1,
-                            pageOffsetFraction = 0f,
-                            animationSpec = spring(stiffness = 800f, dampingRatio = 0.8f),
-                        )
-                    }
-                },
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally)
             ) {
-                Icon(
-                    imageVector = Icons.Default.ChevronLeft,
-                    contentDescription = null,
-                    modifier = Modifier.size(32.dp),
-//                        tint = Color.White,
-                )
+
+                ElevatedButton(
+                    enabled = state.currentPage != 0,
+                    onClick = {
+                        scope.launch {
+                            state.animateScrollToPage(
+                                state.currentPage - 1,
+                                pageOffsetFraction = 0f,
+                                animationSpec = spring(stiffness = 900f, dampingRatio = 0.9f),
+                            )
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronLeft,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+    //                        tint = Color.White,
+                    )
+                }
+
+
+                ElevatedButton(
+                    enabled = state.currentPage != galleryImages.size - 1,
+    //                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer, contentColor = MaterialTheme.colorScheme.onTertiaryContainer),
+                    onClick = {
+                        scope.launch {
+                            state.animateScrollToPage(
+                                state.currentPage + 1,
+                                pageOffsetFraction = 0f,
+                                animationSpec = spring(stiffness = 900f, dampingRatio = 0.9f),
+                            )
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                    )
+                }
             }
 
-
-            ElevatedButton(
-                enabled = state.currentPage != galleryImages.size - 1,
-//                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer, contentColor = MaterialTheme.colorScheme.onTertiaryContainer),
+            FilledIconButton(
                 onClick = {
-                    scope.launch {
-                        state.animateScrollToPage(
-                            state.currentPage + 1,
-                            pageOffsetFraction = 0f,
-                            animationSpec = spring(stiffness = 800f, dampingRatio = 0.8f),
-                        )
-                    }
+                    onClose()
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Default.ChevronRight,
+                    imageVector = Icons.Filled.Close,
                     contentDescription = null,
                     modifier = Modifier.size(32.dp),
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
@@ -608,7 +561,7 @@ fun ImagesPager(imageType: PhotosGalleryType, onClose: () -> Unit) {
 @Composable
 fun DialogImageViewer(imageType: PhotosGalleryType, onClose: () -> Unit) {
     Dialog(onDismissRequest = { /*TODO*/ }, properties = DialogProperties(true, true)) {
-        ImagesPager(imageType = imageType, onClose = onClose)
+        ImagesPager(imageType = imageType, modifier = Modifier.fillMaxSize()) { onClose() }
     }
 }
 
@@ -661,8 +614,9 @@ fun NewsSection(modifier: Modifier = Modifier, navigateToArticle: (news: News) -
 @Composable
 fun NewsItem(news: News, modifier: Modifier = Modifier, onClick: () -> Unit) {
     ElevatedCard(
-        modifier = modifier.size(280.dp, 100.dp),
+        modifier = modifier.size(280.dp, 100.dp).border(.1.dp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(8.dp)),
         elevation = CardDefaults.cardElevation(0.1.dp),
+        shape = RoundedCornerShape(8.dp),
         onClick = { onClick() },
 //        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(green = 0.97f))
     ) {
