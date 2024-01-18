@@ -1,17 +1,21 @@
 package com.mukite.nomad.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.Indication
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +24,6 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,7 +46,6 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -91,52 +93,116 @@ import com.mukite.nomad.data.datasource.DataSource.newsList
 import com.mukite.nomad.data.datasource.DataSource.weatherIconsList
 import com.mukite.nomad.data.datasource.photosGalleryDataSource.cateringServicePhotosGallery
 import com.mukite.nomad.data.datasource.photosGalleryDataSource.establishmentPhotosGallery
-import com.mukite.nomad.data.datasource.photosGalleryDataSource.eventsPhotosGallery
-import com.mukite.nomad.data.datasource.photosGalleryDataSource.newsPhotosGallery
+import com.mukite.nomad.data.datasource.photosGalleryDataSource.eventsExpandedGallery
+import com.mukite.nomad.data.datasource.photosGalleryDataSource.nomadActivitiesGallery
 import com.mukite.nomad.data.model.News
 import com.mukite.nomad.data.model.PhotosGalleryType
 import com.mukite.nomad.data.model.Service
 import com.mukite.nomad.utils.MapScreen
 import com.mukite.nomad.utils.bounceClick
 import com.mukite.nomad.utils.generateNext4Days
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+enum class AnimatedHeaderContentType {
+    TEXT, LOGO
+}
 
 @Composable
 fun HeaderSection(modifier: Modifier = Modifier) {
+    val coroutineScope = rememberCoroutineScope()
+    var contentType by remember { mutableStateOf(AnimatedHeaderContentType.TEXT) }
 
-    Column(modifier = modifier) {
-        Text(
-            text = stringResource(R.string.nomad_hotel_full_name),
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
+    AnimatedContent(
+        modifier = modifier.height(80.dp),
+        contentAlignment = Alignment.Center,
+        targetState = contentType,
+        transitionSpec = {
+            if (targetState == AnimatedHeaderContentType.TEXT) {
+                (slideInVertically { height -> height } + fadeIn())
+                    .togetherWith(slideOutVertically {
+                            height -> -height
+                    } + fadeOut()) using SizeTransform(true)
+            } else {
+                (slideInVertically { height -> -height } + fadeIn())
+                    .togetherWith(slideOutVertically {
+                            height -> height
+                    } + fadeOut()) using SizeTransform(true)
+            }
+        }
+    ) {
+        run {
+            coroutineScope.launch {
+                delay(10000)
+                if (it == AnimatedHeaderContentType.TEXT) {
+                    contentType = AnimatedHeaderContentType.LOGO
+                } else {
+                    contentType = AnimatedHeaderContentType.TEXT
+                }
+            }
+        }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.Top,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Image(
-                imageVector = Icons.Rounded.LocationOn,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(8.dp)
-            )
+        when (it) {
+            AnimatedHeaderContentType.TEXT -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.nomad_hotel_full_name),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
 
-            Text(
-                text = stringResource(R.string.hotel_location),
-                style = MaterialTheme.typography.labelSmall,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-            )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Image(
+                            imageVector = Icons.Rounded.LocationOn,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(8.dp)
+                        )
+
+                        Text(
+                            text = stringResource(R.string.hotel_location),
+                            style = MaterialTheme.typography.labelSmall,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                        )
+                    }
+                }
+            }
+
+            AnimatedHeaderContentType.LOGO -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min) // Maintain constant height
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.logo_small),
+                        contentDescription = null,
+                        modifier = Modifier.align(Alignment.Center),
+                        contentScale = ContentScale.Fit,
+                    )
+                }
+            }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HeaderSectionPreview() {
+    HeaderSection()
 }
 
 @androidx.annotation.OptIn(UnstableApi::class)
@@ -372,7 +438,11 @@ fun PhotoGalleryBox(
                     .padding(start = leftPadding)
                     .height(imageHeight)
                     .width(boxWidth)
-                    .shadow(elevation = 4.dp, shape = RoundedCornerShape(4.dp), spotColor = Color.Black)
+                    .shadow(
+                        elevation = 4.dp,
+                        shape = RoundedCornerShape(4.dp),
+                        spotColor = Color.Black
+                    )
                     .clip(RoundedCornerShape(4.dp))
                     .zIndex((-index).toFloat()),
             ) {
@@ -414,14 +484,16 @@ fun PhotosGalleryRow(onImageClick: (PhotosGalleryType) -> Unit) {
 
         PhotoGalleryBox(cateringServicePhotosGallery, PhotosGalleryType.CATERING_SERVICE) { onImageClick(it) }
 
-        PhotoGalleryBox(eventsPhotosGallery, PhotosGalleryType.EVENTS) { onImageClick(it) }
+        PhotoGalleryBox(eventsExpandedGallery, PhotosGalleryType.EVENTS) { onImageClick(it) }
+
+        PhotoGalleryBox(nomadActivitiesGallery, PhotosGalleryType.NEWS) { onImageClick(it) }
 
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
 
-@Preview(showSystemUi = false, showBackground = true)
+//@Preview(showSystemUi = false, showBackground = true)
 @Composable
 fun GallerySectionPreview() {
     GallerySection(modifier = Modifier, onImageClick = { })
@@ -435,15 +507,15 @@ fun ImagesPager(imageType: PhotosGalleryType, modifier: Modifier = Modifier, onC
     val galleryImages = when (imageType) {
         PhotosGalleryType.ESTABLISHMENT -> establishmentPhotosGallery
         PhotosGalleryType.CATERING_SERVICE -> cateringServicePhotosGallery
-        PhotosGalleryType.EVENTS -> eventsPhotosGallery
-        PhotosGalleryType.NEWS -> newsPhotosGallery
+        PhotosGalleryType.EVENTS -> eventsExpandedGallery
+        PhotosGalleryType.NEWS -> nomadActivitiesGallery
     }
     val scope = rememberCoroutineScope()
     val state = rememberPagerState(initialPage = 0) { galleryImages.size }
 
     Column(
         modifier = modifier,
-//        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -451,7 +523,7 @@ fun ImagesPager(imageType: PhotosGalleryType, modifier: Modifier = Modifier, onC
             state = state,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .fillMaxHeight(.5f),
             verticalAlignment = Alignment.CenterVertically,
             contentPadding = PaddingValues(0.dp),
         ) { image ->
@@ -459,7 +531,7 @@ fun ImagesPager(imageType: PhotosGalleryType, modifier: Modifier = Modifier, onC
                 painter = painterResource(id = galleryImages[image]),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Inside,
+                contentScale = ContentScale.Crop,
                 alignment = Alignment.Center
             )
         }
@@ -614,7 +686,9 @@ fun NewsSection(modifier: Modifier = Modifier, navigateToArticle: (news: News) -
 @Composable
 fun NewsItem(news: News, modifier: Modifier = Modifier, onClick: () -> Unit) {
     ElevatedCard(
-        modifier = modifier.size(280.dp, 100.dp).border(.1.dp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(8.dp)),
+        modifier = modifier
+            .size(280.dp, 100.dp)
+            .border(.1.dp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(8.dp)),
         elevation = CardDefaults.cardElevation(0.1.dp),
         shape = RoundedCornerShape(8.dp),
         onClick = { onClick() },
@@ -631,6 +705,8 @@ fun NewsItem(news: News, modifier: Modifier = Modifier, onClick: () -> Unit) {
                     modifier = Modifier.fillMaxSize()
                 )
             }
+
+
 //            Spacer(modifier = Modifier.width(8.dp))
             Column(
                 modifier = Modifier

@@ -70,7 +70,7 @@ fun HomeScreen(
     }
     val haptic = LocalHapticFeedback.current
 
-    AnimatedVisibility(visible = dialogImageViewerOpened.value, modifier = Modifier.fillMaxSize()) {
+    AnimatedVisibility(visible = dialogImageViewerOpened.value, modifier = Modifier.padding(0.dp).fillMaxSize()) {
         DialogImageViewer(selectedImageType) {
             dialogImageViewerOpened.value = false
         }
@@ -151,7 +151,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)) {
                 Image(
-                    painter = painterResource(id = R.drawable.samsumg_banner_ad_example),
+                    painter = painterResource(id = R.drawable.airtel_ad_banner),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth
                 )
@@ -190,15 +190,6 @@ fun HomeScreen(
             )
 
             Spacer(modifier = Modifier.height(24.dp))
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)) {
-                Image(
-                    painter = painterResource(id = R.drawable.ridge_banner_ad_examples),
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth
-                )
-            }
 
         }
     }
