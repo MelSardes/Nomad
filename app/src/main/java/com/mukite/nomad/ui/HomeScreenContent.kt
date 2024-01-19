@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -93,7 +94,6 @@ import com.mukite.nomad.data.datasource.DataSource.newsList
 import com.mukite.nomad.data.datasource.DataSource.weatherIconsList
 import com.mukite.nomad.data.datasource.photosGalleryDataSource.cateringServicePhotosGallery
 import com.mukite.nomad.data.datasource.photosGalleryDataSource.establishmentPhotosGallery
-import com.mukite.nomad.data.datasource.photosGalleryDataSource.eventsExpandedGallery
 import com.mukite.nomad.data.datasource.photosGalleryDataSource.nomadActivitiesGallery
 import com.mukite.nomad.data.model.News
 import com.mukite.nomad.data.model.PhotosGalleryType
@@ -420,29 +420,31 @@ fun PhotoGalleryBox(
     onImageClick: (PhotosGalleryType) -> Unit
 ) {
 
+    val initialImageWidth = 132.dp
+    val ratio = 132f / 112f
+
     Box(
         contentAlignment = Alignment.CenterStart,
-        modifier = Modifier.bounceClick {
-            onImageClick(galleryType)
-        },
+        modifier = Modifier
+            .bounceClick { onImageClick(galleryType) }
+            .shadow(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(6.dp),
+                spotColor = MaterialTheme.colorScheme.surfaceVariant,
+                ambientColor = MaterialTheme.colorScheme.surfaceVariant
+            ),
     ) {
         photosGallery.take(3).forEachIndexed { index, image ->
             val leftPadding = index * 20.dp
-            val boxWidth = (132 - (index * 10)).dp
-            val ratio = 132f / 112f
-            val imageHeight = (boxWidth * ratio)
+            val imageWidth = initialImageWidth - (index.dp * 10)
+            val imageHeight = (imageWidth * ratio)
 
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .padding(start = leftPadding)
                     .height(imageHeight)
-                    .width(boxWidth)
-                    .shadow(
-                        elevation = 4.dp,
-                        shape = RoundedCornerShape(4.dp),
-                        spotColor = Color.Black
-                    )
+                    .width(imageWidth)
                     .clip(RoundedCornerShape(4.dp))
                     .zIndex((-index).toFloat()),
             ) {
@@ -484,7 +486,7 @@ fun PhotosGalleryRow(onImageClick: (PhotosGalleryType) -> Unit) {
 
         PhotoGalleryBox(cateringServicePhotosGallery, PhotosGalleryType.CATERING_SERVICE) { onImageClick(it) }
 
-        PhotoGalleryBox(eventsExpandedGallery, PhotosGalleryType.EVENTS) { onImageClick(it) }
+//        PhotoGalleryBox(eventsExpandedGallery, PhotosGalleryType.EVENTS) { onImageClick(it) }
 
         PhotoGalleryBox(nomadActivitiesGallery, PhotosGalleryType.NEWS) { onImageClick(it) }
 
@@ -507,7 +509,7 @@ fun ImagesPager(imageType: PhotosGalleryType, modifier: Modifier = Modifier, onC
     val galleryImages = when (imageType) {
         PhotosGalleryType.ESTABLISHMENT -> establishmentPhotosGallery
         PhotosGalleryType.CATERING_SERVICE -> cateringServicePhotosGallery
-        PhotosGalleryType.EVENTS -> eventsExpandedGallery
+//        PhotosGalleryType.EVENTS -> eventsExpandedGallery
         PhotosGalleryType.NEWS -> nomadActivitiesGallery
     }
     val scope = rememberCoroutineScope()
@@ -531,11 +533,12 @@ fun ImagesPager(imageType: PhotosGalleryType, modifier: Modifier = Modifier, onC
                 painter = painterResource(id = galleryImages[image]),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Fit,
                 alignment = Alignment.Center
             )
         }
 
+        Spacer(modifier = Modifier.weight(1f))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -558,7 +561,7 @@ fun ImagesPager(imageType: PhotosGalleryType, modifier: Modifier = Modifier, onC
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.heightIn(16.dp, 32.dp))
 
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -625,7 +628,7 @@ fun ImagesPager(imageType: PhotosGalleryType, modifier: Modifier = Modifier, onC
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.heightIn(16.dp, 32.dp))
     }
 }
 

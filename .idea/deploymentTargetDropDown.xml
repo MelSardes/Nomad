@@ -37,17 +37,8 @@
               <type value="RUNNING_DEVICE_TARGET" />
               <deviceKey>
                 <Key>
-                  <type value="SERIAL_NUMBER" />
-                  <value value="101132535J124813" />
-                </Key>
-              </deviceKey>
-            </Target>
-            <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="SERIAL_NUMBER" />
-                  <value value="192.168.1.64:5555" />
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\SlymDev\.android\avd\Nexus_S_API_29.avd" />
                 </Key>
               </deviceKey>
             </Target>
