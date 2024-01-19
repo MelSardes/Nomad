@@ -105,7 +105,7 @@ fun Suites(modifier: Modifier = Modifier, navigateToDateSelection: () -> Unit) {
         ) {
             Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = stringResource(R.string.nomad_hotel_full_name),
+                    text = stringResource(R.string.our_suites),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.SemiBold,

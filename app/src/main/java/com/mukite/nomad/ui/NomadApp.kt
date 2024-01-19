@@ -35,6 +35,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavDestination
@@ -221,6 +223,7 @@ private fun NomadNavContent(
     val viewModel = remember { NomadViewModel() }
     val appBarScrollState = rememberTopAppBarState()
     val listScrollState = rememberScrollState()
+    val haptic = LocalHapticFeedback.current
 
     NavHost(
         navController = navController,
@@ -249,6 +252,7 @@ private fun NomadNavContent(
                     navigateToDateSelection = { navController.navigate(NomadScreen.BookingDetails.name) },
                     onWeatherClick = {
                         viewModel.updateCurrentPageName("Infos Météo")
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         navController.navigate(NomadScreen.EmptyState.name)
                     },
                     navigateToArticle =  {
@@ -262,6 +266,7 @@ private fun NomadNavContent(
         composable(route = BottomNavigationItem.Settings.route) {
             Settings(appBarScrollState, listScrollState, Modifier.fillMaxSize()) {
                 viewModel.updateCurrentPageName(it)
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 navController.navigate(NomadScreen.EmptyState.name)
                 }
         }

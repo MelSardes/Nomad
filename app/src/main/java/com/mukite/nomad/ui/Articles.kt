@@ -27,7 +27,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +44,8 @@ import com.mukite.nomad.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Article(viewModel: NomadViewModel, onBack: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
+
     val uiState by viewModel.uiState.collectAsState()
     val article = uiState.selectedArticle
 
@@ -55,7 +59,10 @@ fun Article(viewModel: NomadViewModel, onBack: () -> Unit) {
             },
             navigationIcon = {
                 IconButton(
-                    onClick = { onBack() }) {
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onBack()
+                    }) {
                     Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null)
                 }
             }

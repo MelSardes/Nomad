@@ -21,6 +21,8 @@ import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +38,7 @@ fun SelectDateScreen(
     onClickNext: () -> Unit,
 ) {
     val dateRangePickerState = rememberDateRangePickerState(initialDisplayMode = DisplayMode.Picker)
+    val haptic = LocalHapticFeedback.current
 
     Box(modifier = modifier.fillMaxSize()) {
 
@@ -54,6 +57,8 @@ fun SelectDateScreen(
 
                 TextButton(
                     onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+
                         viewModel.updateBookingDates(
                             Pair(
                                 dateRangePickerState.selectedStartDateMillis!!,

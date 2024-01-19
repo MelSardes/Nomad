@@ -51,6 +51,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -74,6 +76,8 @@ fun BookingHistory(
     modifier: Modifier = Modifier,
     navigateToDetails: () -> Unit
 ) {
+    val haptic = LocalHapticFeedback.current
+
     val uiState = viewModel.uiState.collectAsState()
     var selectedChip by rememberSaveable { mutableIntStateOf(0) }
     val searchBarState = remember { mutableStateOf(false) }
@@ -97,7 +101,11 @@ fun BookingHistory(
                 placeholder = { Text(text = stringResource(id = R.string.search_placeholder), color = Color.LightGray) },
                 leadingIcon = {
                     if (searchBarState.value) {
-                        IconButton(onClick = { searchBarState.value = false }) {
+                        IconButton(onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+
+                            searchBarState.value = false
+                        }) {
                             Icon(
                                 imageVector = Icons.Filled.ArrowBack,
                                 contentDescription = null,
@@ -169,6 +177,8 @@ fun BookingHistory(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun TopBar(onSearchIconTap: () -> Unit = {}) {
+    val haptic = LocalHapticFeedback.current
+
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -177,7 +187,11 @@ private fun TopBar(onSearchIconTap: () -> Unit = {}) {
             )
         },
         actions = {
-            IconButton(onClick = { onSearchIconTap() }) {
+            IconButton(onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+
+                onSearchIconTap()
+            }) {
                 Icon(imageVector = Icons.Filled.Search, contentDescription = null)
             }
         }

@@ -49,8 +49,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -67,6 +69,7 @@ fun Settings(
     modifier: Modifier = Modifier,
     navigateToEmptyState: (title: String) -> Unit
 ) {
+    val haptic = LocalHapticFeedback.current
 
     val activity = (LocalContext.current as? Activity)
     val exitModalShown = remember { mutableStateOf(false) }
@@ -124,7 +127,11 @@ fun Settings(
                             onClick = { exitModalShown.value = false }
                         ) { Text("Annuler", color = MaterialTheme.colorScheme.secondary) }
 
-                        TextButton(onClick = { activity?.finish() }
+                        TextButton(onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+
+                            activity?.finish()
+                        }
                         ) { Text("Se déconnecter") }
                     }
                 },

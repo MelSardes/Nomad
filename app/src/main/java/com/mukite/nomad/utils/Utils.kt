@@ -12,7 +12,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -49,6 +51,7 @@ enum class ButtonState { Pressed, Idle }
 fun Modifier.bounceClick(action: () -> Unit) = composed {
     var buttonState by remember { mutableStateOf(ButtonState.Idle) }
     val scale by animateFloatAsState(if (buttonState == ButtonState.Pressed) 0.9f else 1f)
+    val haptic = LocalHapticFeedback.current
 
     this
         .graphicsLayer {
@@ -69,6 +72,10 @@ fun Modifier.bounceClick(action: () -> Unit) = composed {
         .clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null,
-            onClick = { action() }
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+
+                action()
+            }
         )
 }

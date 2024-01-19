@@ -63,8 +63,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -82,6 +84,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.core.net.toUri
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player.REPEAT_MODE_ONE
 import androidx.media3.common.util.UnstableApi
@@ -505,6 +508,7 @@ fun GallerySectionPreview() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImagesPager(imageType: PhotosGalleryType, modifier: Modifier = Modifier, onClose: () -> Unit) {
+    val haptic = LocalHapticFeedback.current
 
     val galleryImages = when (imageType) {
         PhotosGalleryType.ESTABLISHMENT -> establishmentPhotosGallery
@@ -617,6 +621,8 @@ fun ImagesPager(imageType: PhotosGalleryType, modifier: Modifier = Modifier, onC
 
             FilledIconButton(
                 onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+
                     onClose()
                 }
             ) {
